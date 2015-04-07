@@ -6,6 +6,10 @@
 
 var React = require('react-native');
 var {
+  DatePickerIOS,
+  TabBarIOS,
+  ListView,
+  TextInput,
   AppRegistry,
   StyleSheet,
   Text,
@@ -37,10 +41,73 @@ var AttendanceTracker = React.createClass({
           Press Cmd+R to reload,{'\n'}
           Cmd+Control+Z for dev menu
         </Text>
+        <View style={styles.tabbar}>{this.renderTabBar()}</View>
       </View>
+    );
+  },
+
+  getInitialState: function() {
+    return {
+      selectedTab: 'createTab',
+    };
+  },
+                                          
+  _icon: function(imageUri) {
+    return {
+      uri: imageUri,
+      isStatic: true
+    };
+  },
+
+  renderTabBar: function() {
+    return (
+      <TabBarIOS>
+        <TabBarIOS.Item
+          icon={this._icon('favorites')}
+          selected={this.state.selectedTab === 'createTab'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'createTab'
+            });
+          }}>
+          <Text>create</Text>
+        </TabBarIOS.Item>
+        <TabBarIOS.Item
+          icon={this._icon('history')}
+          selected={this.state.selectedTab === 'editTab'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'editTab'
+            });
+          }}>
+          <Text>create</Text>
+        </TabBarIOS.Item>
+        <TabBarIOS.Item
+          icon={this._icon('more')}
+          selected={this.state.selectedTab === 'attendanceTab'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'attendanceTab'
+            });
+          }}>
+          <Text>create</Text>
+        </TabBarIOS.Item>
+        <TabBarIOS.Item
+          icon={this._icon('contacts')}
+          selected={this.state.selectedTab === 'syncTab'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'syncTab'
+            });
+          }}>
+          <Text>create</Text>
+        </TabBarIOS.Item>
+      </TabBarIOS>
     );
   }
 });
+
+
 
 var styles = StyleSheet.create({
   container: {
@@ -59,6 +126,8 @@ var styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  tabbar: {
+    
 });
 
 AppRegistry.registerComponent('AttendanceTracker', () => AttendanceTracker);

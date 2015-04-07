@@ -21,7 +21,6 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
-		6EA985FF1AD41F64008D15E3 /* libMTSCRA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EA985FE1AD41F64008D15E3 /* libMTSCRA.a */; };
 		6EA986021AD4200A008D15E3 /* index.ios.js in Resources */ = {isa = PBXBuildFile; fileRef = 6EA986011AD4200A008D15E3 /* index.ios.js */; };
 		6EA986081AD4245F008D15E3 /* CardReaderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6EA986071AD4245F008D15E3 /* CardReaderManager.m */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
@@ -111,8 +110,6 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = iOS/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = iOS/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
-		6EA985FE1AD41F64008D15E3 /* libMTSCRA.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMTSCRA.a; path = "iDynamo SDK/Lib/Release-iphoneos/libMTSCRA.a"; sourceTree = "<group>"; };
-		6EA986001AD41F7B008D15E3 /* MTSCRA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTSCRA.h; path = "iDynamo SDK/SampleCode/Classes/MTSCRA.h"; sourceTree = "<group>"; };
 		6EA986011AD4200A008D15E3 /* index.ios.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = index.ios.js; sourceTree = "<group>"; };
 		6EA986061AD4245F008D15E3 /* CardReaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CardReaderManager.h; sourceTree = "<group>"; };
 		6EA986071AD4245F008D15E3 /* CardReaderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardReaderManager.m; sourceTree = "<group>"; };
@@ -127,7 +124,6 @@
 				00481BEA1AC0C89D00671115 /* libicucore.dylib in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00481BE81AC0C86700671115 /* libRCTWebSocketDebugger.a in Frameworks */,
-				6EA985FF1AD41F64008D15E3 /* libMTSCRA.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E61ABCBA2D00DB3ED1 /* libRCTAdSupport.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
@@ -225,8 +221,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				6EA986001AD41F7B008D15E3 /* MTSCRA.h */,
-				6EA985FE1AD41F64008D15E3 /* libMTSCRA.a */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -470,17 +464,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/Lib/Release-iphoneos",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/Lib/Release-iphonesimulator",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/SampleCode/Lib/Release-iphoneos",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/SampleCode/Lib/Release-iphonesimulator",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = AttendanceTracker;
 			};
@@ -497,17 +481,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/Lib/Release-iphoneos",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/Lib/Release-iphonesimulator",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/SampleCode/Lib/Release-iphoneos",
-					"$(PROJECT_DIR)/iDynamo",
-					"SDK/SampleCode/Lib/Release-iphonesimulator",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = AttendanceTracker;
 			};
