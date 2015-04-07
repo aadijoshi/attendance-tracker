@@ -1,0 +1,213 @@
+// !$*UTF8*$!
+{
+	1D3623240D0F684500981E51 /* MagTekDemoAppDelegate.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1011, 498}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 491}";
+		};
+	};
+	1D6058900D05DD3D006BFB54 /* MagTekDemo */ = {
+		activeExec = 0;
+		executables = (
+			C9340759117F8F1D0082C270 /* MagTekDemo */,
+		);
+	};
+	28D7ACF60DDB3853001CB0EB /* MagTekDemoViewController.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1011, 975}}";
+			sepNavSelRange = "{567, 11}";
+			sepNavVisRange = "{490, 1098}";
+		};
+	};
+	28D7ACF70DDB3853001CB0EB /* MagTekDemoViewController.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1293, 6331}}";
+			sepNavSelRange = "{11009, 0}";
+			sepNavVisRange = "{10395, 1230}";
+		};
+	};
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeExecutable = C9340759117F8F1D0082C270 /* MagTekDemo */;
+		activeSDKPreference = iphoneos3.1.2;
+		activeTarget = 1D6058900D05DD3D006BFB54 /* MagTekDemo */;
+		addToTargets = (
+			1D6058900D05DD3D006BFB54 /* MagTekDemo */,
+		);
+		codeSenseManager = C9340765117F8F2A0082C270 /* Code sense */;
+		executables = (
+			C9340759117F8F1D0082C270 /* MagTekDemo */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					833,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 294945180;
+			PBXWorkspaceStateSaveDate = 294945180;
+		};
+		perUserProjectItems = {
+			C92B590C118F4762009279BC /* PBXTextBookmark */ = C92B590C118F4762009279BC /* PBXTextBookmark */;
+			C96F914A11947C8000ECCC86 /* PlistBookmark */ = C96F914A11947C8000ECCC86 /* PlistBookmark */;
+			C974A067119481C600052A69 /* PBXTextBookmark */ = C974A067119481C600052A69 /* PBXTextBookmark */;
+			C974A068119481C600052A69 /* PBXTextBookmark */ = C974A068119481C600052A69 /* PBXTextBookmark */;
+			C974A069119481C600052A69 /* PBXTextBookmark */ = C974A069119481C600052A69 /* PBXTextBookmark */;
+			C974A06A119481C600052A69 /* PBXTextBookmark */ = C974A06A119481C600052A69 /* PBXTextBookmark */;
+			C974A06F119481C600052A69 /* PlistBookmark */ = C974A06F119481C600052A69 /* PlistBookmark */;
+		};
+		sourceControlManager = C9340764117F8F2A0082C270 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	29B97316FDCFA39411CA2CEA /* main.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1011, 498}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 358}";
+		};
+	};
+	32CA4F630368D1EE00C91783 /* MagTekDemo_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1011, 498}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 189}";
+		};
+	};
+	C92B590C118F4762009279BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 28D7ACF60DDB3853001CB0EB /* MagTekDemoViewController.h */;
+		name = "MagTekDemoViewController.h: 26";
+		rLen = 11;
+		rLoc = 567;
+		rType = 0;
+		vrLen = 1098;
+		vrLoc = 490;
+	};
+	C9340759117F8F1D0082C270 /* MagTekDemo */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = MagTekDemo;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	C9340764117F8F2A0082C270 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	C9340765117F8F2A0082C270 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	C96F914A11947C8000ECCC86 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* MagTekDemo-Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleIdentifier,
+		);
+		name = "/Users/magtek/MagTek/MagTekDemo/MagTekDemo-Info.plist";
+		rLen = 0;
+		rLoc = 9223372036854775808;
+	};
+	C974A067119481C600052A69 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1D3623240D0F684500981E51 /* MagTekDemoAppDelegate.h */;
+		name = "MagTekDemoAppDelegate.h: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 491;
+		vrLoc = 0;
+	};
+	C974A068119481C600052A69 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 32CA4F630368D1EE00C91783 /* MagTekDemo_Prefix.pch */;
+		name = "MagTekDemo_Prefix.pch: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 189;
+		vrLoc = 0;
+	};
+	C974A069119481C600052A69 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+		name = "main.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 358;
+		vrLoc = 0;
+	};
+	C974A06A119481C600052A69 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 28D7ACF70DDB3853001CB0EB /* MagTekDemoViewController.m */;
+		name = "MagTekDemoViewController.m: 361";
+		rLen = 0;
+		rLoc = 11009;
+		rType = 0;
+		vrLen = 1230;
+		vrLoc = 10395;
+	};
+	C974A06F119481C600052A69 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* MagTekDemo-Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleIdentifier,
+		);
+		name = "/Users/magtek/MagTek/MagTekDemo/MagTekDemo-Info.plist";
+		rLen = 0;
+		rLoc = 0;
+	};
+}
