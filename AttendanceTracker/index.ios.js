@@ -11,6 +11,7 @@ var React = require('react-native');
  var {
   AppRegistry,
   DatePickerIOS,
+  TouchableHighlight,
   TabBarIOS,
   ListView,
   TextInput,
@@ -73,10 +74,10 @@ var AttendanceTracker = React.createClass({
     return (
       <TabBarIOS>
         <TabBarIOSItemContent tabName='createTab' iconURI='favorites' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Create></Create>
+            <Event title="Create a New Event"></Event>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='editTab' iconURI='history' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <View style={styles.container}><Text>bla2</Text></View>
+            <Event title="Edit an Existing Event"></Event>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
             <View style={styles.container}><Text>bla3</Text></View>
@@ -89,17 +90,22 @@ var AttendanceTracker = React.createClass({
   },
 });
 
-var Create = React.createClass({
-  getInitialState: function() {
+var Event = React.createClass({
+  getDefaultProps: function() {
     return {
       date: new Date(),
     };
   },
+  getInitialState: function() {
+    return {
+      date: this.props.date,
+    };
+  },
   render: function() {
     return (
-      <View style={styles.container}>
+       <View style={styles.container}>
         <Text style={styles.title}>
-          Create a New Event
+          {this.props.title}
         </Text>
         <View style={styles.inputContainer}>
           <TextInput
@@ -109,28 +115,27 @@ var Create = React.createClass({
             onChangeText={(text) => this.setState({eventName: text})}
             placeholder='Event Name'
             returnKeyType='next'
-            keyboardType='ascii-capable'
+            keyboardType='default'
           />
           <DatePickerIOS
             date={this.state.date}
             mode="date"
-            onDateChange={(date) => {
-              this.setState({
-                date: date
-              });
-            }}
+            onDateChange={(date) => this.setState({date: date})}
           />
         </View>
-        <Button style={styles.submit} onPress={function(){console.log('bla')}}>
-          Submit
-        </Button>
+        <TouchableHighlight style={styles.submit} onPress={function(){console.log('submit')}}>
+          <Text>Submit</Text>
+        </TouchableHighlight>
       </View>
     );
   },
 });
 
+var Search = React.createClass({
+  render: function () {
 
-
+  }
+})
 
 
 var styles = StyleSheet.create({
