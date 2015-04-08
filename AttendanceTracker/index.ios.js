@@ -45,43 +45,45 @@ var AttendanceTracker = React.createClass({
     };
   },
 
-  tabBarProps: function(tabName, iconURI, onPressfn) {
-    return (
-      icon={this._icon({iconURI})}
-      selected={this.state.selectedTab === {tabName}}
-      onPress={() => {
-        this.setState({
-          selectedTab: {tabName}
-        });
-        {onPressfn}
-      }}
-    );
-  },
-
   render: function() {
     return (
       <TabBarIOS>
-        {this.renderTabItem('createTab', 'favorites', () => console.log("createTab"), </Create>)}
-        <TabBarIOS.Item
-          {this.tabBarProps('createTab', 'favorites', function(){console.log('createTab')})}>
+        <TabBarIOSItemContent tabName='createTab' iconURI='favorites' onPressfn=function(){console.log('createTab')}>
             </Create>
-        </TabBarIOS.Item>
-        <TabBarIOS.Item
-          {this.tabBarProps('editTab', 'history', function(){console.log('editTab')})}>
-            </Edit>
-        </TabBarIOS.Item>
-        <TabBarIOS.Item
-          {this.tabBarProps('attendanceTab', 'more', function(){console.log('attendanceTab')})}>
-            </Attendance>
-        </TabBarIOS.Item>
-        <TabBarIOS.Item
-          {this.tabBarProps('syncTab', 'contact', function(){console.log('syncTab')})}>
-            </Sync>
-        </TabBarIOS.Item>
+        </TabBarIOSItemContent>
+        <TabBarIOSItemContent tabName='editTab' iconURI='history' onPressfn=function(){console.log('editTab')}>
+            </Create>
+        </TabBarIOSItemContent>
+        <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' onPressfn=function(){console.log('attendanceTab')}>
+            </Create>
+        </TabBarIOSItemContent>
+        <TabBarIOSItemContent tabName='syncTab' iconURI='contacts' onPressfn=function(){console.log('syncTab')}>
+            </Create>
+        </TabBarIOSItemContent>
       </TabBarIOS>
     );
   },
 });
+
+var TabBarIOSItemContent = React.createClass({
+  render: function() {
+    return (
+      <TabBarIOS.Item
+        icon={this._icon({this.props.iconURI})}
+        selected={this.state.selectedTab === {this.props.tabName}}
+        onPress={() => {
+          this.setState({
+            selectedTab: {this.props.tabName}
+          });
+          {this.props.onPressfn}
+        }}
+      >
+        {this.props.children}
+      </TabBarIOS.Item>
+    );
+  },
+});
+
 
 var Create = React.createClass({
   getInitialState: function() {
