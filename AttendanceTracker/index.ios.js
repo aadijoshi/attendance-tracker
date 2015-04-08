@@ -9,15 +9,18 @@ var Button = require('react-native-button');
 var React = require('react-native');
 
  var {
+  AppRegistry,
   DatePickerIOS,
   TabBarIOS,
   ListView,
   TextInput,
-  AppRegistry,
   StyleSheet,
   Text,
   View,
 } = React;
+
+
+
 
 //var CardReaderManager = require('NativeModules').CardReaderManager;
 //
@@ -28,7 +31,28 @@ var React = require('react-native');
 //    console.log(msg);
 //  }
 //});
-
+var TabBarIOSItemContent = React.createClass({
+  _icon: function(imageUri) {
+    return {
+      uri: imageUri,
+      isStatic: true
+    };
+  },
+  onPressHandler: function() {
+    this.props.onPressHandler(this.props.tabName);
+  },
+  render: function() {
+    return (
+      <TabBarIOS.Item
+        icon={this._icon(this.props.iconURI)}
+        selected={this.props.selectedTab === this.props.tabName}
+        onPress={this.onPressHandler}
+      >
+        {this.props.children}
+      </TabBarIOS.Item>
+    );
+  },
+});
 
 var AttendanceTracker = React.createClass({
 
@@ -38,52 +62,32 @@ var AttendanceTracker = React.createClass({
     };
   },
 
-  _icon: function(imageUri) {
-    return {
-      uri: imageUri,
-      isStatic: true
-    };
+  onPressHandler: function(tabName) {
+    this.setState({
+      selectedTab:tabName,
+    });
+    console.log(tabName);
   },
 
   render: function() {
     return (
       <TabBarIOS>
-        <TabBarIOSItemContent tabName='createTab' iconURI='favorites' onPressfn=function(){console.log('createTab')}>
-            </Create>
+        <TabBarIOSItemContent tabName='createTab' iconURI='favorites' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
+            <Create></Create>
         </TabBarIOSItemContent>
-        <TabBarIOSItemContent tabName='editTab' iconURI='history' onPressfn=function(){console.log('editTab')}>
-            </Create>
+        <TabBarIOSItemContent tabName='editTab' iconURI='history' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
+            <View style={styles.container}><Text>bla2</Text></View>
         </TabBarIOSItemContent>
-        <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' onPressfn=function(){console.log('attendanceTab')}>
-            </Create>
+        <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
+            <View style={styles.container}><Text>bla3</Text></View>
         </TabBarIOSItemContent>
-        <TabBarIOSItemContent tabName='syncTab' iconURI='contacts' onPressfn=function(){console.log('syncTab')}>
-            </Create>
+        <TabBarIOSItemContent tabName='syncTab' iconURI='contacts' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
+            <View style={styles.container}><Text>bla4</Text></View>
         </TabBarIOSItemContent>
       </TabBarIOS>
     );
   },
 });
-
-var TabBarIOSItemContent = React.createClass({
-  render: function() {
-    return (
-      <TabBarIOS.Item
-        icon={this._icon({this.props.iconURI})}
-        selected={this.state.selectedTab === {this.props.tabName}}
-        onPress={() => {
-          this.setState({
-            selectedTab: {this.props.tabName}
-          });
-          {this.props.onPressfn}
-        }}
-      >
-        {this.props.children}
-      </TabBarIOS.Item>
-    );
-  },
-});
-
 
 var Create = React.createClass({
   getInitialState: function() {
@@ -93,36 +97,40 @@ var Create = React.createClass({
   },
   render: function() {
     return (
-      <View style={style.container}>
-        <Text style={style.title}>
+      <View style={styles.container}>
+        <Text style={styles.title}>
           Create a New Event
         </Text>
-        <View style={style.inputContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
-            style={style.input}
-            autoFocus={true}
+            style={styles.input}
+            autoFocus={false}
             clearButtonMode='while-editing'
             onChangeText={(text) => this.setState({eventName: text})}
             placeholder='Event Name'
             returnKeyType='next'
+            keyboardType='ascii-capable'
           />
           <DatePickerIOS
             date={this.state.date}
             mode="date"
-            onDateChange={(data) => {
+            onDateChange={(date) => {
               this.setState({
-                date: {data}
+                date: date
               });
             }}
           />
         </View>
-        <Button style={style.submit} onPress={function(){console.log({this.state})};}>
+        <Button style={styles.submit} onPress={function(){console.log('bla')}}>
           Submit
         </Button>
       </View>
     );
   },
 });
+
+
+
 
 
 var styles = StyleSheet.create({
@@ -132,14 +140,13 @@ var styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
     alignItems: 'center'
   },
-  tabContent: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  tabText: {
-    color: 'white',
-    margin: 50,
-  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+  }
 });
 
 AppRegistry.registerComponent('AttendanceTracker', () => AttendanceTracker);
+
+
