@@ -5,6 +5,7 @@
 'use strict';
 
 var React = require('react-native');
+
 var {
   DatePickerIOS,
   TabBarIOS,
@@ -16,36 +17,18 @@ var {
   View,
 } = React;
 
-var CardReaderManager = require('NativeModules').CardReaderManager;
-
-CardReaderManager.test((error, msg) => {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log(msg);
-  }
-})
+//var CardReaderManager = require('NativeModules').CardReaderManager;
+//
+//CardReaderManager.test((error, msg) => {
+//  if (error) {
+//    console.error(error);
+//  } else {
+//    console.log(msg);
+//  }
+//});
 
 
 var AttendanceTracker = React.createClass({
-  render: function() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+Control+Z for dev menu
-        </Text>
-        <View style={styles.tabbar}>{this.renderTabBar()}</View>
-      </View>
-    );
-  },
-
   getInitialState: function() {
     return {
       selectedTab: 'createTab',
@@ -59,7 +42,16 @@ var AttendanceTracker = React.createClass({
     };
   },
 
-  renderTabBar: function() {
+  _renderContent: function(text: string) {
+    return (
+    <View style={styles.container}>
+        <Text>
+          {text}
+        </Text>
+        </View>)},
+  
+
+  render: function() {
     return (
       <TabBarIOS>
         <TabBarIOS.Item
@@ -70,7 +62,7 @@ var AttendanceTracker = React.createClass({
               selectedTab: 'createTab'
             });
           }}>
-          <Text>create</Text>
+          {this._renderContent('Create New Event')}
         </TabBarIOS.Item>
         <TabBarIOS.Item
           icon={this._icon('history')}
@@ -80,7 +72,7 @@ var AttendanceTracker = React.createClass({
               selectedTab: 'editTab'
             });
           }}>
-          <Text>create</Text>
+          {this._renderContent('Edit Existing Event')}
         </TabBarIOS.Item>
         <TabBarIOS.Item
           icon={this._icon('more')}
@@ -90,7 +82,7 @@ var AttendanceTracker = React.createClass({
               selectedTab: 'attendanceTab'
             });
           }}>
-          <Text>create</Text>
+          {this._renderContent('Start Taking Attendance')}
         </TabBarIOS.Item>
         <TabBarIOS.Item
           icon={this._icon('contacts')}
@@ -100,7 +92,7 @@ var AttendanceTracker = React.createClass({
               selectedTab: 'syncTab'
             });
           }}>
-          <Text>create</Text>
+          {this._renderContent('Sync Your Data')}
         </TabBarIOS.Item>
       </TabBarIOS>
     );
@@ -108,26 +100,21 @@ var AttendanceTracker = React.createClass({
 });
 
 
-
 var styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
+    alignItems: 'center'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  tabContent: {
+    flex: 1,
+    alignItems: 'center',
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-  tabbar: {
-    
+  tabText: {
+    color: 'white',
+    margin: 50,
+  },    
 });
 
 AppRegistry.registerComponent('AttendanceTracker', () => AttendanceTracker);
