@@ -4,7 +4,9 @@
  */
  'use strict';
 
- var React = require('react-native');
+
+var Button = require('react-native-button');
+var React = require('react-native');
 
  var {
   DatePickerIOS,
@@ -29,6 +31,7 @@
 
 
 var AttendanceTracker = React.createClass({
+
   getInitialState: function() {
     return {
       selectedTab: 'createTab',
@@ -42,70 +45,81 @@ var AttendanceTracker = React.createClass({
     };
   },
 
-  renderTabItem: function(tabName: string, iconName: string, onPressfn, content)
-  {
+  tabBarProps: function(tabName, iconURI, onPressfn) {
     return (
-      <TabBarIOS.Item
-        icon={this._icon({iconName})}
-        selected={this.state.selectedTab === {tabName}}
-        onPress={() => {
-          this.setState({
-            selectedTab: {tabName}
-          });
-          {onPressfn}
-        }}>
-        {content}
-      </TabBarIOS.Item>
-    )
-  }
+      icon={this._icon({iconURI})}
+      selected={this.state.selectedTab === {tabName}}
+      onPress={() => {
+        this.setState({
+          selectedTab: {tabName}
+        });
+        {onPressfn}
+      }}
+    );
+  },
 
   render: function() {
     return (
       <TabBarIOS>
         {this.renderTabItem('createTab', 'favorites', () => console.log("createTab"), </Create>)}
         <TabBarIOS.Item
-        icon={this._icon('history')}
-        selected={this.state.selectedTab === 'editTab'}
-        onPress={() => {
-          this.setState({
-            selectedTab: 'editTab'
-          });
-        }}>
-        {this._renderContent('Edit Existing Event')}
+          {this.tabBarProps('createTab', 'favorites', function(){console.log('createTab')})}>
+            </Create>
         </TabBarIOS.Item>
         <TabBarIOS.Item
-        icon={this._icon('more')}
-        selected={this.state.selectedTab === 'attendanceTab'}
-        onPress={() => {
-          this.setState({
-            selectedTab: 'attendanceTab'
-          });
-        }}>
-        {this._renderContent('Start Taking Attendance')}
+          {this.tabBarProps('editTab', 'history', function(){console.log('editTab')})}>
+            </Edit>
         </TabBarIOS.Item>
         <TabBarIOS.Item
-        icon={this._icon('contacts')}
-        selected={this.state.selectedTab === 'syncTab'}
-        onPress={() => {
-          this.setState({
-            selectedTab: 'syncTab'
-          });
-        }}>
-        {this._renderContent('Sync Your Data')}
+          {this.tabBarProps('attendanceTab', 'more', function(){console.log('attendanceTab')})}>
+            </Attendance>
+        </TabBarIOS.Item>
+        <TabBarIOS.Item
+          {this.tabBarProps('syncTab', 'contact', function(){console.log('syncTab')})}>
+            </Sync>
         </TabBarIOS.Item>
       </TabBarIOS>
-      );
-}
+    );
+  },
 });
 
 var Create = React.createClass({
-  render: function () {
-    <View style={styles.container}>
-      <Text>
-        Create a new event
-      </Text>
-    </View>
-  }
+  getInitialState: function() {
+    return {
+      date: new Date(),
+    };
+  },
+  render: function() {
+    return (
+      <View style={style.container}>
+        <Text style={style.title}>
+          Create a New Event
+        </Text>
+        <View style={style.inputContainer}>
+          <TextInput
+            style={style.input}
+            autoFocus={true}
+            clearButtonMode='while-editing'
+            onChangeText={(text) => this.setState({eventName: text})}
+            placeholder='Event Name'
+            returnKeyType='next'
+          />
+          <DatePickerIOS
+            date={this.state.date}
+            mode="date"
+            onDateChange={(data) => {
+              this.setState({
+                date: {data}
+              });
+            }}
+          />
+        </View>
+        <Button style={style.submit} onPress={function(){console.log({this.state})};}>
+          Submit
+        </Button>
+      </View>
+    );
+  },
 });
 
 
