@@ -4,6 +4,7 @@
  */
 'use strict';
 
+var Button = require('react-native-button');
 var React = require('react-native');
 
 var {
@@ -29,12 +30,13 @@ var {
 
 
 var AttendanceTracker = React.createClass({
+
   getInitialState: function() {
     return {
       selectedTab: 'createTab',
     };
   },
-                                          
+
   _icon: function(imageUri) {
     return {
       uri: imageUri,
@@ -42,61 +44,80 @@ var AttendanceTracker = React.createClass({
     };
   },
 
-  _renderContent: function(text: string) {
+  tabBarProps: function(tabName, iconURI, onPressfn) {
     return (
-    <View style={styles.container}>
-        <Text>
-          {text}
-        </Text>
-        </View>)},
-  
+      icon={this._icon({iconURI})}
+      selected={this.state.selectedTab === {tabName}}
+      onPress={() => {
+        this.setState({
+          selectedTab: {tabName}
+        });
+        {onPressfn}
+      }}
+    );
+  },
 
   render: function() {
     return (
       <TabBarIOS>
         <TabBarIOS.Item
-          icon={this._icon('favorites')}
-          selected={this.state.selectedTab === 'createTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'createTab'
-            });
-          }}>
-          {this._renderContent('Create New Event')}
+          {this.tabBarProps('createTab', 'favorites', function(){console.log('createTab')})}>
+            </Create>
         </TabBarIOS.Item>
         <TabBarIOS.Item
-          icon={this._icon('history')}
-          selected={this.state.selectedTab === 'editTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'editTab'
-            });
-          }}>
-          {this._renderContent('Edit Existing Event')}
+          {this.tabBarProps('editTab', 'history', function(){console.log('editTab')})}>
+            </Edit>
         </TabBarIOS.Item>
         <TabBarIOS.Item
-          icon={this._icon('more')}
-          selected={this.state.selectedTab === 'attendanceTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'attendanceTab'
-            });
-          }}>
-          {this._renderContent('Start Taking Attendance')}
+          {this.tabBarProps('attendanceTab', 'more', function(){console.log('attendanceTab')})}>
+            </Attendance>
         </TabBarIOS.Item>
         <TabBarIOS.Item
-          icon={this._icon('contacts')}
-          selected={this.state.selectedTab === 'syncTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'syncTab'
-            });
-          }}>
-          {this._renderContent('Sync Your Data')}
+          {this.tabBarProps('syncTab', 'contact', function(){console.log('syncTab')})}>
+            </Sync>
         </TabBarIOS.Item>
       </TabBarIOS>
     );
-  }
+  },
+});
+
+var Create = React.createClass({
+  getInitialState: function() {
+    return {
+      date: new Date(),
+    };
+  },
+  render: function() {
+    return (
+      <View style={style.container}>
+        <Text style={style.title}>
+          Create a New Event
+        </Text>
+        <View style={style.inputContainer}>
+          <TextInput
+            style={style.input}
+            autoFocus={true}
+            clearButtonMode='while-editing'
+            onChangeText={(text) => this.setState({eventName: text})}
+            placeholder='Event Name'
+            returnKeyType='next'
+          />
+          <DatePickerIOS
+            date={this.state.date}
+            mode="date"
+            onDateChange={(data) => {
+              this.setState({
+                date: {data}
+              });
+            }}
+          />
+        </View>
+        <Button style={style.submit} onPress={function(){console.log({this.state})};}>
+          Submit
+        </Button>
+      </View>
+    );
+  },
 });
 
 
@@ -114,7 +135,7 @@ var styles = StyleSheet.create({
   tabText: {
     color: 'white',
     margin: 50,
-  },    
+  },
 });
 
 AppRegistry.registerComponent('AttendanceTracker', () => AttendanceTracker);
