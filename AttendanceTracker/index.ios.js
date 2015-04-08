@@ -2,11 +2,11 @@
  * Sample React Native App
  * https://github.com/facebook/react-native
  */
-'use strict';
+ 'use strict';
 
-var React = require('react-native');
+ var React = require('react-native');
 
-var {
+ var {
   DatePickerIOS,
   TabBarIOS,
   ListView,
@@ -34,7 +34,7 @@ var AttendanceTracker = React.createClass({
       selectedTab: 'createTab',
     };
   },
-                                          
+
   _icon: function(imageUri) {
     return {
       uri: imageUri,
@@ -42,60 +42,69 @@ var AttendanceTracker = React.createClass({
     };
   },
 
-  _renderContent: function(text: string) {
+  renderTabItem: function(tabName: string, iconName: string, onPressfn, content)
+  {
     return (
-    <View style={styles.container}>
-        <Text>
-          {text}
-        </Text>
-        </View>)},
-  
+      <TabBarIOS.Item
+        icon={this._icon({iconName})}
+        selected={this.state.selectedTab === {tabName}}
+        onPress={() => {
+          this.setState({
+            selectedTab: {tabName}
+          });
+          {onPressfn}
+        }}>
+        {content}
+      </TabBarIOS.Item>
+    )
+  }
 
   render: function() {
     return (
       <TabBarIOS>
+        {this.renderTabItem('createTab', 'favorites', () => console.log("createTab"), </Create>)}
         <TabBarIOS.Item
-          icon={this._icon('favorites')}
-          selected={this.state.selectedTab === 'createTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'createTab'
-            });
-          }}>
-          {this._renderContent('Create New Event')}
+        icon={this._icon('history')}
+        selected={this.state.selectedTab === 'editTab'}
+        onPress={() => {
+          this.setState({
+            selectedTab: 'editTab'
+          });
+        }}>
+        {this._renderContent('Edit Existing Event')}
         </TabBarIOS.Item>
         <TabBarIOS.Item
-          icon={this._icon('history')}
-          selected={this.state.selectedTab === 'editTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'editTab'
-            });
-          }}>
-          {this._renderContent('Edit Existing Event')}
+        icon={this._icon('more')}
+        selected={this.state.selectedTab === 'attendanceTab'}
+        onPress={() => {
+          this.setState({
+            selectedTab: 'attendanceTab'
+          });
+        }}>
+        {this._renderContent('Start Taking Attendance')}
         </TabBarIOS.Item>
         <TabBarIOS.Item
-          icon={this._icon('more')}
-          selected={this.state.selectedTab === 'attendanceTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'attendanceTab'
-            });
-          }}>
-          {this._renderContent('Start Taking Attendance')}
-        </TabBarIOS.Item>
-        <TabBarIOS.Item
-          icon={this._icon('contacts')}
-          selected={this.state.selectedTab === 'syncTab'}
-          onPress={() => {
-            this.setState({
-              selectedTab: 'syncTab'
-            });
-          }}>
-          {this._renderContent('Sync Your Data')}
+        icon={this._icon('contacts')}
+        selected={this.state.selectedTab === 'syncTab'}
+        onPress={() => {
+          this.setState({
+            selectedTab: 'syncTab'
+          });
+        }}>
+        {this._renderContent('Sync Your Data')}
         </TabBarIOS.Item>
       </TabBarIOS>
-    );
+      );
+}
+});
+
+var Create = React.createClass({
+  render: function () {
+    <View style={styles.container}>
+      <Text>
+        Create a new event
+      </Text>
+    </View>
   }
 });
 
@@ -114,7 +123,7 @@ var styles = StyleSheet.create({
   tabText: {
     color: 'white',
     margin: 50,
-  },    
+  },
 });
 
 AppRegistry.registerComponent('AttendanceTracker', () => AttendanceTracker);
