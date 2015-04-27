@@ -1,7 +1,5 @@
 var React = require('react-native');
-var MOCK_EVENTS = require('./index.ios.js');
-console.log(MOCK_EVENTS);
-
+var App = require('./index.ios.js');
 
 var {
   StyleSheet,
@@ -11,6 +9,11 @@ var {
   DatePickerIOS,
   TouchableHighlight,
 } = React;
+
+var {
+  MOCK_EVENTS,
+  styles,
+} = App;
 
 var Event = React.createClass({
   getInitialState: function() {
@@ -43,7 +46,7 @@ var Event = React.createClass({
       MOCK_EVENTS[oldEventId].date = newEvent.date;
 
     }
-    this.props.onSubmitHandler("syncTab", newEvent);
+    this.props.onSubmitHandler("attendanceTab", newEvent, false, true);
   },
   render: function() {
     return (
@@ -74,22 +77,6 @@ var Event = React.createClass({
       </View>
     );
   },
-});
-
-var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    containerBackgroundColor: 'white' 
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-  }
 });
 
 module.exports = Event;

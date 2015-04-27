@@ -1,4 +1,5 @@
 var React = require('react-native');
+var App = require('./index.ios.js');
 
 var {
   StyleSheet,
@@ -6,7 +7,12 @@ var {
   View,
 } = React;
 
-var Search = React.createClass({
+var {
+  MOCK_EVENTS,
+  styles,
+} = App;
+
+var Sync = React.createClass({
 	render: function() {
     	return (
 			<View style={styles.container}>
@@ -16,15 +22,4 @@ var Search = React.createClass({
 	},
 });
 
-var styles = StyleSheet.create({
-container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    containerBackgroundColor: 'white' 
-  },
-});
-
-module.exports = Search;
+module.exports = Sync;

@@ -1,5 +1,5 @@
 var React = require('react-native');
-var MOCK_EVENTS = require('./index.ios.js');
+var App = require('./index.ios.js');
 
 var {
   StyleSheet,
@@ -9,6 +9,12 @@ var {
   ListView,
   TouchableHighlight,
 } = React;
+
+
+var {
+  MOCK_EVENTS,
+  styles,
+} = App;
 
 var Search = React.createClass({
   getInitialState: function () {
@@ -22,8 +28,8 @@ var Search = React.createClass({
   onSubmitHandler: function(event) {
     console.log("Search onSubmitHandler");
     console.log(event);
-    if (this.props.targetTab == "syncTab") {
-      this.props.onSubmitHandler(this.props.targetTab, event);
+    if (this.props.targetTab == "attendanceTab") {
+      this.props.onSubmitHandler(this.props.targetTab, event, false, true);
     } else if (this.props.targetTab == "editTab") {
       this.props.onSubmitHandler(this.props.targetTab, event, true);
     }
@@ -37,7 +43,7 @@ var Search = React.createClass({
         <View>
           <TextInput
             style={styles.input}
-            autoFocus={true}
+            autoFocus={false}
             clearButtonMode='while-editing'
             onChangeText={this.search}
             placeholder='Event Name'
@@ -74,23 +80,6 @@ var Search = React.createClass({
       ),
     });
   },
-});
-
-
-var styles = StyleSheet.create({
-container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    containerBackgroundColor: 'white' 
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-  }
 });
 
 module.exports = Search;

@@ -39,10 +39,32 @@ var MOCK_EVENTS =
     ids: []
   },
 ];
-module.exports = MOCK_EVENTS;
+
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  title: {
+    containerBackgroundColor: 'white' 
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+  }
+});
+
+module.exports = {
+  styles: styles,
+  MOCK_EVENTS: MOCK_EVENTS,
+};
+
 
 var Search = require('./Search.js');
 var Event = require('./Event.js');
+var Attendance = require('./Attendance.js');
 var Sync = require('./Sync.js');
 
 
@@ -84,41 +106,37 @@ var AttendanceTracker = React.createClass({
   getInitialState: function() {
     return {
       selectedTab: 'createTab',
+      editing:false,
+      currentEvent:null,
+      takingAttendance:false,
     };
   },
 
   onPressHandler: function(tabName) {
+    this.replaceState(this.getInitialState());
     this.setState({
       selectedTab:tabName,
-      editing:false,
-      currentEvent:null,
     });
   },
-  onSubmitHandler: function(tabName, event, editing) {
-    if (event != null) {
-      this.setState({
-        currentEvent:event,
-      });
-    };
-    if (editing == true && tabName == "editTab") {
-      this.setState({
-        editing : true,
-      });
-    } else {
-      this.setState({
-        editing : false,
-      });
-    }
+  onSubmitHandler: function(tabName, event, editing, takingAttendance) {
     this.setState({
-      selectedTab:tabName,
+      currentEvent: event,
+      editing : editing,
+      takingAttendance: takingAttendance,
+      selectedTab: tabName,
     });
   },
   render: function() {
-    var editTabContent;
+    var editTabContent, attendanceTabContent;
     if (this.state.editing) {
       editTabContent = (<Event title="Edit an Existing Event" onSubmitHandler={this.onSubmitHandler} event={this.state.currentEvent}></Event>);
     } else {
       editTabContent = (<Search title="Find an Event to Edit" onSubmitHandler={this.onSubmitHandler} targetTab="editTab"></Search>);
+    }
+    if (this.state.takingAttendance) {
+      attendanceTabContent = (<Attendance event={this.state.currentEvent}></Attendance>);
+    } else {
+      attendanceTabContent = (<Search title="Find an Event to Start Taking Attendance" onSubmitHandler={this.onSubmitHandler} targetTab="attendanceTab"></Search>);
     }
     return (
       <TabBarIOS>
@@ -126,10 +144,10 @@ var AttendanceTracker = React.createClass({
             <Event title="Create a New Event" onSubmitHandler={this.onSubmitHandler}></Event>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='editTab' iconURI='history' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            {editTabContent}
+          {editTabContent}
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Search title="Find an Event to Start Taking Attendance" onSubmitHandler={this.onSubmitHandler} targetTab="syncTab"></Search>
+          {attendanceTabContent}
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='syncTab' iconURI='contacts' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
             <Sync></Sync>
@@ -139,9 +157,8 @@ var AttendanceTracker = React.createClass({
   },
 });
 
-var styles = StyleSheet.create({
-  
-});
+
+
 
 
 
