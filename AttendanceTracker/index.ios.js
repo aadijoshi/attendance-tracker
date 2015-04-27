@@ -99,13 +99,13 @@ var AttendanceTracker = React.createClass({
     return (
       <TabBarIOS>
         <TabBarIOSItemContent tabName='createTab' iconURI='favorites' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Event title="Create a New Event"></Event>
+            <Event title="Create a New Event" onSubmitHander={this.onPressHandler}></Event>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='editTab' iconURI='history' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Event title="Edit an Existing Event"></Event>
+            <Event title="Edit an Existing Event" onSubmitHander={this.onPressHandler}></Event>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Search title="Find an Event to Start Taking Attendance"></Search>
+            <Search title="Find an Event to Start Taking Attendance" onSubmitHander={this.onPressHandler}></Search>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='syncTab' iconURI='contacts' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
             <View style={styles.container}><Text>bla4</Text></View>
@@ -125,6 +125,15 @@ var Event = React.createClass({
     return {
       date: this.props.date,
     };
+  },
+  onSubmitHandler: function() {
+    var newEvent = {
+      name: this.state.eventName,
+      date: this.state.date,
+      ids: [],
+    };
+    MOCK_EVENTS.push(newEvent);
+    this.props.onSubmitHandler("syncTab", newEvent);
   },
   render: function() {
     return (
@@ -148,7 +157,7 @@ var Event = React.createClass({
             onDateChange={(date) => this.setState({date: date})}
           />
         </View>
-        <TouchableHighlight style={styles.submit} onPress={function(){console.log(this.state)}}>
+        <TouchableHighlight style={styles.submit} onPress={this.onSubmitHander}}>
           <Text>Submit</Text>
         </TouchableHighlight>
       </View>
