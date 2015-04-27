@@ -91,6 +91,8 @@ var AttendanceTracker = React.createClass({
   onPressHandler: function(tabName) {
     this.setState({
       selectedTab:tabName,
+      editing:false,
+      currentEvent:null,
     });
   },
   onSubmitHandler: function(tabName, event, editing) {
@@ -108,7 +110,9 @@ var AttendanceTracker = React.createClass({
         editing : false,
       });
     }
-    this.onPressHandler(tabName);
+    this.setState({
+      selectedTab:tabName,
+    });
   },
   render: function() {
     var editTabContent;
@@ -146,7 +150,7 @@ var Event = React.createClass({
     } else {
       return {
         date: new Date(),
-        name: "Event Name",
+        name: "",
       };
     }
 
@@ -179,7 +183,8 @@ var Event = React.createClass({
             autoFocus={false}
             clearButtonMode='while-editing'
             onChangeText={(text) => this.setState({name: text})}
-            placeholder={this.state.name}
+            placeholder="Event Name"
+            value={this.state.name == "" ? null : this.state.name}
             returnKeyType='next'
             keyboardType='default'
           />
@@ -208,7 +213,7 @@ var Search = React.createClass({
   },
   onSubmitHandler: function(event) {
     console.log("Search onSubmitHandler");
-    console.log(this.props.targetTab);
+    console.log(event);
     if (this.props.targetTab == "syncTab") {
       this.props.onSubmitHandler(this.props.targetTab, event);
     } else if (this.props.targetTab == "editTab") {
@@ -231,17 +236,18 @@ var Search = React.createClass({
             returnKeyType='next'
             keyboardType='default'
           />
-        </View>
-        <ListView
+          <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderEvent}
         />
+        </View>
+        
       </View>
     );
   },
   renderEvent: function(event) {
     return (
-      <TouchableHighlight style={styles.event} onPress={this.props.onSubmitHandler} event={event}>
+      <TouchableHighlight style={styles.event} onPress={this.onSubmitHandler.bind(this, event)}>
         <View>
           <Text>{event.name}</Text>
           <Text>{event.date.toDateString()}</Text>
