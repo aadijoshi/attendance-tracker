@@ -22,7 +22,7 @@ var MOCK_EVENTS =
 [
   {
     name: "Karting",
-    date: new Date(2015, 01, 10, 0, 0, 0, 0),
+    date: new Date(2015, 1, 10, 0, 0, 0, 0),
     ids: [
       "N1",
       "N22",
@@ -32,7 +32,7 @@ var MOCK_EVENTS =
   },
   {
     name: "Archery",
-    date: new Date(2015, 02, 20, 0, 0, 0, 0),
+    date: new Date(2015, 2, 20, 0, 0, 0, 0),
     ids: [
       "N4444",
       "N1",
@@ -40,7 +40,7 @@ var MOCK_EVENTS =
   },
   {
     name: "Wakeboarding",
-    date: new Date(2015, 03, 30, 0, 0, 0, 0),
+    date: new Date(2015, 3, 30, 0, 0, 0, 0),
     ids: []
   },
 ]
@@ -92,7 +92,6 @@ var AttendanceTracker = React.createClass({
     this.setState({
       selectedTab:tabName,
     });
-    console.log(tabName);
   },
   onSubmitHandler: function(tabName, event, editing) {
     if (event != null) {
@@ -102,11 +101,11 @@ var AttendanceTracker = React.createClass({
     };
     if (editing == true && tabName == "editTab") {
       this.setState({
-        editing = true;
+        editing : true,
       });
     } else {
       this.setState({
-        editing = false;
+        editing : false,
       });
     }
     this.onPressHandler(tabName);
@@ -138,34 +137,33 @@ var AttendanceTracker = React.createClass({
 });
 
 var Event = React.createClass({
-  getDefaultProps: function() {
-    if (this.props.event != null){
+  getInitialState: function() {
+    if (this.props.event != null) {
       return {
         date: this.props.event.date,
-        eventName: this.props.event.name,
+        name: this.props.event.name,
       };
     } else {
       return {
         date: new Date(),
-        eventName: "Event Name",
+        name: "Event Name",
       };
     }
-  },
-  getInitialState: function() {
-    return {
-      date: this.props.date,
-    };
+
   },
   onSubmitHandler: function() {
     var newEvent = {
-      name: this.state.eventName,
+      name: this.state.name,
       date: this.state.date,
       ids: [],
     };
     if (this.props.event == null) {
       MOCK_EVENTS.push(newEvent);
     } else {
-      MOCK_EVENTS[MOCK_EVENTS.indexOf(this.props.event)] = newEvent;
+      var oldEventId = MOCK_EVENTS.indexOf(this.props.event);
+      MOCK_EVENTS[oldEventId].name = newEvent.name;
+      MOCK_EVENTS[oldEventId].date = newEvent.date;
+
     }
     this.props.onSubmitHandler("syncTab", newEvent);
   },
@@ -180,8 +178,8 @@ var Event = React.createClass({
             style={styles.input}
             autoFocus={false}
             clearButtonMode='while-editing'
-            onChangeText={(text) => this.setState({eventName: text})}
-            placeholder={this.state.eventName}
+            onChangeText={(text) => this.setState({name: text})}
+            placeholder={this.state.name}
             returnKeyType='next'
             keyboardType='default'
           />
@@ -191,7 +189,7 @@ var Event = React.createClass({
             onDateChange={(date) => this.setState({date: date})}
           />
         </View>
-        <TouchableHighlight style={styles.submit} onPress={this.onSubmitHandler}}>
+        <TouchableHighlight style={styles.submit} onPress={this.onSubmitHandler}>
           <Text>Submit</Text>
         </TouchableHighlight>
       </View>
@@ -209,6 +207,8 @@ var Search = React.createClass({
     }
   },
   onSubmitHandler: function(event) {
+    console.log("Search onSubmitHandler");
+    console.log(this.props.targetTab);
     if (this.props.targetTab == "syncTab") {
       this.props.onSubmitHandler(this.props.targetTab, event);
     } else if (this.props.targetTab == "editTab") {
@@ -241,19 +241,21 @@ var Search = React.createClass({
   },
   renderEvent: function(event) {
     return (
-      <TouchableHighlight style={styles.event} onPress={this.onSubmitHandler(event)}>
-        <Text>{event.name}</Text>
-        <Text>{event.date.toDateString()}</Text>
-        <Text>{event.ids.length}</Text>
-      </View>
+      <TouchableHighlight style={styles.event} onPress={this.props.onSubmitHandler} event={event}>
+        <View>
+          <Text>{event.name}</Text>
+          <Text>{event.date.toDateString()}</Text>
+          <Text>{event.ids.length}</Text>
+        </View>
+      </TouchableHighlight>
     );
   },
   search: function(text) {
     this.setState({
       eventName: text,
       dataSource: this.state.dataSource.cloneWithRows(
-        this.state.dataSource.filter(
-          (event) => event.name.search(text) != -1
+        MOCK_EVENTS.filter(
+          (event) => event.name.toLowerCase().indexOf(text.toLowerCase()) != -1
         )
       ),
     });
