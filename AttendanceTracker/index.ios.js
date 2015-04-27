@@ -18,6 +18,33 @@ var React = require('react-native');
   View,
 } = React;
 
+var MOCK_EVENTS =
+[
+  {
+    name: "Karting",
+    date: new Date(2015, 01, 10, 0, 0, 0, 0),
+    ids: [
+      "N1",
+      "N22",
+      "N333",
+      "N444"
+      ]
+  },
+  {
+    name: "Archery",
+    date: new Date(2015, 02, 20, 0, 0, 0, 0),
+    ids: [
+      "N4444",
+      "N1",
+      ]
+  },
+  {
+    name: "Wakeboarding",
+    date: new Date(2015, 03, 30, 0, 0, 0, 0),
+    ids: []
+  },
+]
+
 
 
 
@@ -121,7 +148,7 @@ var Event = React.createClass({
             onDateChange={(date) => this.setState({date: date})}
           />
         </View>
-        <TouchableHighlight style={styles.submit} onPress={function(){console.log(this.state.date)}}>
+        <TouchableHighlight style={styles.submit} onPress={function(){console.log(this.state)}}>
           <Text>Submit</Text>
         </TouchableHighlight>
       </View>
@@ -129,7 +156,15 @@ var Event = React.createClass({
   },
 });
 
-var Event = React.createClass({
+var Search = React.createClass({
+  getInitialState: function () {
+    var ds = new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      });
+    return {
+      dataSource: ds.cloneWithRows(MOCK_EVENTS),
+    }
+  }
   render: function() {
     return (
        <View style={styles.container}>
@@ -139,27 +174,44 @@ var Event = React.createClass({
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            autoFocus={false}
+            autoFocus={true}
             clearButtonMode='while-editing'
-            onChangeText={(text) => this.setState({eventName: text})}
+            onChangeText={this.search}
             placeholder='Event Name'
             returnKeyType='next'
             keyboardType='default'
           />
-          <DatePickerIOS
-            date={this.state.date}
-            mode="date"
-            onDateChange={(date) => this.setState({date: date})}
-          />
         </View>
-        <TouchableHighlight style={styles.submit} onPress={function(){console.log('submit')}}>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderEvent}
+        />
+        <TouchableHighlight style={styles.submit} onPress={function(){console.log(this.state)}}>
           <Text>Submit</Text>
         </TouchableHighlight>
       </View>
     );
   },
+  renderEvent: function(event) {
+    return (
+      <View style={styles.event}>
+        <Text>{event.name}</Text>
+        <Text>{event.date.toDateString()}</Text>
+        <Text>{event.ids.length}</Text>
+      </View>
+    );
+  },
+  search: function(text) {
+    this.setState({
+      eventName: text,
+      dataSource: this.state.dataSource.cloneWithRows(
+        this.state.dataSource.filter(
+          (event) => event.name.search(text) != -1
+        )
+      ),
+    });
+  },
 });
-
 
 var styles = StyleSheet.create({
   container: {
