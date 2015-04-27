@@ -94,18 +94,40 @@ var AttendanceTracker = React.createClass({
     });
     console.log(tabName);
   },
-
+  onSubmitHandler: function(tabName, event, editing) {
+    if (event != null) {
+      this.setState({
+        currentEvent:event,
+      });
+    };
+    if (editing == true && tabName == "editTab") {
+      this.setState({
+        editing = true;
+      });
+    } else {
+      this.setState({
+        editing = false;
+      });
+    }
+    this.onPressHandler(tabName);
+  },
   render: function() {
+    var editTabContent;
+    if (this.state.editing) {
+      editTabContent = (<Event title="Edit an Existing Event" onSubmitHandler={this.onSubmitHandler} event={this.state.currentEvent}></Event>);
+    } else {
+      editTabContent = (<Search title="Find an Event to Edit" onSubmitHandler={this.onSubmitHandler} targetTab="editTab"></Search>);
+    }
     return (
       <TabBarIOS>
         <TabBarIOSItemContent tabName='createTab' iconURI='favorites' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Event title="Create a New Event" onSubmitHander={this.onPressHandler}></Event>
+            <Event title="Create a New Event" onSubmitHandler={this.onSubmitHandler}></Event>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='editTab' iconURI='history' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Event title="Edit an Existing Event" onSubmitHander={this.onPressHandler}></Event>
+            {editTabContent}
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='attendanceTab' iconURI='more' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
-            <Search title="Find an Event to Start Taking Attendance" onSubmitHander={this.onPressHandler}></Search>
+            <Search title="Find an Event to Start Taking Attendance" onSubmitHandler={this.onSubmitHandler} targetTab="syncTab"></Search>
         </TabBarIOSItemContent>
         <TabBarIOSItemContent tabName='syncTab' iconURI='contacts' selectedTab={this.state.selectedTab} onPressHandler={this.onPressHandler}>
             <View style={styles.container}><Text>bla4</Text></View>
@@ -117,9 +139,17 @@ var AttendanceTracker = React.createClass({
 
 var Event = React.createClass({
   getDefaultProps: function() {
-    return {
-      date: new Date(),
-    };
+    if (this.props.event != null){
+      return {
+        date: this.props.event.date,
+        eventName: this.props.event.name,
+      };
+    } else {
+      return {
+        date: new Date(),
+        eventName: "Event Name",
+      };
+    }
   },
   getInitialState: function() {
     return {
@@ -132,7 +162,11 @@ var Event = React.createClass({
       date: this.state.date,
       ids: [],
     };
-    MOCK_EVENTS.push(newEvent);
+    if (this.props.event == null) {
+      MOCK_EVENTS.push(newEvent);
+    } else {
+      MOCK_EVENTS[MOCK_EVENTS.indexOf(this.props.event)] = newEvent;
+    }
     this.props.onSubmitHandler("syncTab", newEvent);
   },
   render: function() {
@@ -147,7 +181,7 @@ var Event = React.createClass({
             autoFocus={false}
             clearButtonMode='while-editing'
             onChangeText={(text) => this.setState({eventName: text})}
-            placeholder='Event Name'
+            placeholder={this.state.eventName}
             returnKeyType='next'
             keyboardType='default'
           />
@@ -157,7 +191,7 @@ var Event = React.createClass({
             onDateChange={(date) => this.setState({date: date})}
           />
         </View>
-        <TouchableHighlight style={styles.submit} onPress={this.onSubmitHander}}>
+        <TouchableHighlight style={styles.submit} onPress={this.onSubmitHandler}}>
           <Text>Submit</Text>
         </TouchableHighlight>
       </View>
@@ -173,7 +207,14 @@ var Search = React.createClass({
     return {
       dataSource: ds.cloneWithRows(MOCK_EVENTS),
     }
-  }
+  },
+  onSubmitHandler: function(event) {
+    if (this.props.targetTab == "syncTab") {
+      this.props.onSubmitHandler(this.props.targetTab, event);
+    } else if (this.props.targetTab == "editTab") {
+      this.props.onSubmitHandler(this.props.targetTab, event, true);
+    }
+  },
   render: function() {
     return (
        <View style={styles.container}>
@@ -195,15 +236,12 @@ var Search = React.createClass({
           dataSource={this.state.dataSource}
           renderRow={this.renderEvent}
         />
-        <TouchableHighlight style={styles.submit} onPress={function(){console.log(this.state)}}>
-          <Text>Submit</Text>
-        </TouchableHighlight>
       </View>
     );
   },
   renderEvent: function(event) {
     return (
-      <View style={styles.event}>
+      <TouchableHighlight style={styles.event} onPress={this.onSubmitHandler(event)}>
         <Text>{event.name}</Text>
         <Text>{event.date.toDateString()}</Text>
         <Text>{event.ids.length}</Text>
