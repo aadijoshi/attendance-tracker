@@ -1,5 +1,5 @@
 var React = require('react-native');
-var App = require('./index.ios.js');
+var styles = require('./index.ios.js');
 
 var {
   StyleSheet,
@@ -7,17 +7,14 @@ var {
   View,
 } = React;
 
-var {
-  MOCK_EVENTS,
-  styles,
-} = App;
-
 var Sync = React.createClass({
 	render: function() {
+		console.log("rendering sync");
     	return (
-			<View style={styles.container}>
+    		<View style={styles.container}>
 				<Text style={styles.title}>Sync</Text>
 			</View>
+    		
 		);
 	},
 });

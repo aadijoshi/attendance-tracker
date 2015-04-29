@@ -1,16 +1,11 @@
 var React = require('react-native');
-var App = require('./index.ios.js');
+var styles = require('./index.ios.js');
 
 var {
   StyleSheet,
   Text,
   View,
 } = React;
-
-var {
-  MOCK_EVENTS,
-  styles,
-} = App;
 
 var Attendance = React.createClass({
 	render: function() {

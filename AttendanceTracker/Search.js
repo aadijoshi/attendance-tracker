@@ -1,5 +1,5 @@
 var React = require('react-native');
-var App = require('./index.ios.js');
+var styles = require('./index.ios.js');
 
 var {
   StyleSheet,
@@ -9,12 +9,6 @@ var {
   ListView,
   TouchableHighlight,
 } = React;
-
-
-var {
-  MOCK_EVENTS,
-  styles,
-} = App;
 
 var Search = React.createClass({
   getInitialState: function () {
