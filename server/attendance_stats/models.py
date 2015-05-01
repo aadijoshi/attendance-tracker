@@ -13,14 +13,19 @@ class Student(models.Model):
         (MALE, 'M'),
     )
     gender = models.CharField(max_length=1,
-                                choices=GENDER,
-                                default=FEMALE)
+                                choices=GENDER)
     year = models.IntegerField()
 
+    class Meta:
+        db_table = "displayer_capability"
+        verbose_name_plural = "capabilities"
+
     def __str__(self):
-        return "{0} {1} ({2!s}}".format(self.first_name,
-                                        self.last_name,
-                                        self.n_number)
+        return "{0} {1} ({2!s})".format(
+                    self.first_name,
+                    self.last_name,
+                    self.n_number
+                    )
 
 class Event(models.Model):
     name = models.CharField(max_length=256)
@@ -29,6 +34,10 @@ class Event(models.Model):
     creator = models.CharField(max_length=64)
 
     def __str__(self):
-        return "{0} {1!s} ({2!s} participants)".format(self.name,
-                                                     self.date,
-                                                     self.participants.count())
+        count = self.participants.count()
+        return "{0} {1!s} ({2!s} participant{plural})".format(
+                    self.name,
+                    self.date,
+                    count,
+                    plural="s" if count != 1 else "",
+                    )
