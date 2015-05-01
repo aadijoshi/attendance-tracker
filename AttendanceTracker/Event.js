@@ -1,79 +1,99 @@
 var React = require('react-native');
-var App = require('./index.ios.js');
+var styles = require('./index.ios.js');
+var guid = require('./guid.js');
 
 var {
   StyleSheet,
   Text,
   View,
   TextInput,
-  DatePickerIOS,
+  ScrollView,
+  ListView,
   TouchableHighlight,
+  AsyncStorage,
 } = React;
 
-var {
-  MOCK_EVENTS,
-  styles,
-} = App;
 
 var Event = React.createClass({
   getInitialState: function() {
-    if (this.props.event != null) {
-      console.log("event not null");
-      return {
-        date: this.props.event.date,
-        name: this.props.event.name,
-      };
-    } else {
-      console.log("event null");
-      return {
-        date: new Date(),
-        name: "",
-      };
+    return {
+      name: this.props.name,
+      date: this.props.state,
+      ids: this.props.ids,
+      dataSource: 
+        new ListView.DataSource({
+          rowHasChanged: (row1, row2) => row1 !== row2,
+        }).cloneWithRows(this.props.ids),
     }
-
   },
-  onSubmitHandler: function() {
-    var newEvent = {
-      name: this.state.name,
-      date: this.state.date,
-      ids: [],
-    };
-    if (this.props.event == null) {
-      MOCK_EVENTS.push(newEvent);
-    } else {
-      var oldEventId = MOCK_EVENTS.indexOf(this.props.event);
-      MOCK_EVENTS[oldEventId].name = newEvent.name;
-      MOCK_EVENTS[oldEventId].date = newEvent.date;
-
-    }
-    this.props.onSubmitHandler("attendanceTab", newEvent, false, true);
+  componentWillMount: function() {
+    this.setState({
+      key: guid()
+    });
+  },
+  home: function() {
+    this.props.navigator.push({
+      title: "Home",
+      component: Home,
+    });
+  },
+  store: function(newIds) {
+    console.log(JSON.stringify(this.state));
+    AsyncStorage.setItem(this.state.key, JSON.stringify(this.state))
+      .then(() => {
+        this.setState({
+          ids: newIds,
+          dataSource: this.state.dataSource.cloneWithRows(newIds),
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .done();
+  },
+  onSwipe: function() {
+    this.store(this.state.ids.concat(["yay"]));
+  },
+  deleteID: function(id) {
+    var temp_ids = this.state.ids.slice();
+    temp_ids.splice(this.state.ids.indexOf(id), 1);
+    this.store(temp_ids);
+  },
+  renderName: function(id) {
+    return (
+      <TouchableHighlight onPress={this.deleteID.bind(this, id)}>
+          <Text>{id}</Text>
+      </TouchableHighlight>
+    );
   },
   render: function() {
     return (
        <View style={styles.container}>
         <Text style={styles.title}>
-          {this.props.title}
+          Create Event
         </Text>
-        <View>
-          <TextInput
-            style={styles.input}
-            autoFocus={false}
-            clearButtonMode='while-editing'
-            onChangeText={(text) => this.setState({name: text})}
-            placeholder="Event Name"
-            value={this.state.name == "" ? null : this.state.name}
-            returnKeyType='next'
-            keyboardType='default'
-          />
-          <DatePickerIOS
-            date={this.state.date}
-            mode="date"
-            onDateChange={(date) => this.setState({date: date})}
-          />
-        </View>
-        <TouchableHighlight onPress={this.onSubmitHandler}>
-          <Text>Submit</Text>
+        <TextInput
+          style={styles.input}
+          autoFocus={true}
+          clearButtonMode='while-editing'
+          onChangeText={(text) => this.setState({name: text})}
+          onSubmitEditing={()=>this.store}
+          placeholder="Event Name"
+          value={this.state.name}
+          returnKeyType='done'
+          keyboardType='default'
+        />
+        <Text>{this.props.date.toDateString()}</Text>
+        <TouchableHighlight onPress={this.onSwipe}>
+          <Text>Swipe</Text>
         </TouchableHighlight>
+        <TouchableHighlight onPress={this.home}>
+          <Text>Home</Text>
+        </TouchableHighlight>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderName}
+        />
       </View>
     );
   },
