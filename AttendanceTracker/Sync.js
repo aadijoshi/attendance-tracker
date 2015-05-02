@@ -13,45 +13,55 @@ var Sync = React.createClass({
 	getInitialState: function() {
 		return {
 			events: [],
-      loadingPromise: new Promise((resolve, reject) => {
-        var rejectTimeout, resolveInterval;
-        rejectTimeout = setTimeout(() => {
-          console.log("rejectTimeout");
-          clearInterval(resolveInterval);
-          console.log("rejectTimeout2");
-          reject("Event loading is unusually slow, please try again.");
-        }, 5000);  
-        resolveInterval = setInterval(() => {
-          console.log("resolveInterval");
-
-          if (this.state.events.length != 0) {
-          console.log("resolveInterval2");
-            clearTimeout(rejectTimeout);
-          console.log("resolveInterval3");
-            clearInterval(resolveInterval);
-          console.log("resolveInterval4");
-            resolve("Finished loading events");
-          }
-        }, 500);
-      })
+      allowSync: false,
 		}
 	},
   componentWillMount: function () {
     AsyncStorage.getAllKeys()
-      .then((keys) => {
-        Promise.all(keys.map((key) => {return AsyncStorage.getItem(key);}))
-          .then((events) => { this.setState({events: events});})
-          .catch((err) => {console.log(err);})
-          .done();
-      })
+      .then((keys) => {return Promise.all(keys.map((key) => {return AsyncStorage.getItem(key);}));})
+      .then((events) => {this.setState({events: events.map(JSON.parse), allowSync: true});})
       .catch((err) => {console.log(err);})
       .done();
   },
-  sync: function() {
-    this.state.loadingPromise
-      .then((msg) => {console.log(msg);console.log(this.state);})
-      .catch((err) => {console.log(err);})
+  deleteEvent: function(event) {
+    AsyncStorage.removeItem(event.uuid)
+      .then(() => {
+        var tmp_events = this.state.events.slice();
+        tmp_events.splice(this.state.events.indexOf(event), 1);
+        this.setState({
+          events: tmp_events,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
       .done();
+  },
+  sync: function() {
+    if (this.state.allowSync) {
+      Promise.all(this.state.events.map((event) => {
+        return fetch("http://10.230.9.173:8000/sync", {
+          method: "post",
+          body: JSON.stringify(event),
+        })
+          .then((response) => {
+            if (response.status >= 200 && response.status < 300) {
+              this.deleteEvent(event);
+              return Promise.resolve(response);
+            } else {
+              return Promise.reject(response);
+            }
+          });
+      }))
+        .then(() => {
+          console.log("Events have finished syncing");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("Please wait while events load");
+    }
   },
 	render: function() {
     	return (

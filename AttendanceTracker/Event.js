@@ -13,9 +13,10 @@ var {
   AsyncStorage,
 } = React;
 
+NNumbers = [818799090, 813549627, 811111111, 822222222, 833333333];
+
 var Event = React.createClass({
   getInitialState: function() {
-    console.log(this.props);
     return {
       name: this.props.name,
       date: this.props.date,
@@ -26,10 +27,6 @@ var Event = React.createClass({
           rowHasChanged: (row1, row2) => row1 !== row2,
         }).cloneWithRows(this.props.swiped),
     }
-  },
-  componentDidMount: function() {
-    console.log(this.state);
-    console.log(this.props);
   },
   store: function(newSwiped) {
     var storing = {
@@ -49,7 +46,7 @@ var Event = React.createClass({
       .done();
   },
   onSwipe: function() {
-    this.store(this.state.swiped.concat(["yay"]));
+    this.store(this.state.swiped.concat([NNumbers[Math.floor(Math.random() * NNumbers.length)]]));
   },
   goHome: function() {
     if (this.props.editing) {
