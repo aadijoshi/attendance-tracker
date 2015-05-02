@@ -13,63 +13,45 @@ var Sync = React.createClass({
 	getInitialState: function() {
 		return {
 			events: [],
-			loading: 0,
+      loadingPromise: new Promise((resolve, reject) => {
+        var rejectTimeout, resolveInterval;
+        rejectTimeout = setTimeout(() => {
+          console.log("rejectTimeout");
+          clearInterval(resolveInterval);
+          console.log("rejectTimeout2");
+          reject("Event loading is unusually slow, please try again.");
+        }, 5000);  
+        resolveInterval = setInterval(() => {
+          console.log("resolveInterval");
+
+          if (this.state.events.length != 0) {
+          console.log("resolveInterval2");
+            clearTimeout(rejectTimeout);
+          console.log("resolveInterval3");
+            clearInterval(resolveInterval);
+          console.log("resolveInterval4");
+            resolve("Finished loading events");
+          }
+        }, 500);
+      })
 		}
 	},
   componentWillMount: function () {
- 	this.setState({
- 		loading: 1,
- 		loadingPromise: new Promise (
- 			(resolve, reject) => {
- 				if (this.state.loading == 0){
- 					resolve(this.state.loading);
- 				} else {
- 					reject(this.state.loading);
- 				}
- 			}
- 		),
- 	});
     AsyncStorage.getAllKeys()
       .then((keys) => {
-      	this.setState({
-        	loading: this.state.loading+keys.length,
-        });
-        for (var i = 0; i<keys.length; i++) {
-          AsyncStorage.getItem(keys[i])
-          .then((event) => {
-            var newEvents = this.state.events.concat(JSON.parse(event));
-            this.setState({
-              events: newEvents,
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .done(() => {
-          	this.setState({
-          		loading: this.state.loading-1,
-          	});
-          });
-        }
+        Promise.all(keys.map((key) => {return AsyncStorage.getItem(key);}))
+          .then((events) => { this.setState({events: events});})
+          .catch((err) => {console.log(err);})
+          .done();
       })
-      .catch((error) => {
-        console.log(error);
-      })
-      .done(() => {
-      	this.setState({
-      		loading: this.state.loading-1,
-      	});
-      });
+      .catch((err) => {console.log(err);})
+      .done();
   },
   sync: function() {
-  	this.state.loadingPromise
-  		.then(() => {
-  			console.log("finished loading events");
-  		})
-  		.catch((error) => {
-  			console.log(error);
-  		})
-  		.done();
+    this.state.loadingPromise
+      .then((msg) => {console.log(msg);console.log(this.state);})
+      .catch((err) => {console.log(err);})
+      .done();
   },
 	render: function() {
     	return (

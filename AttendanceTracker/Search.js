@@ -25,28 +25,15 @@ var Search = React.createClass({
   componentWillMount: function () {
     AsyncStorage.getAllKeys()
       .then((keys) => {
-        for (var i = 0; i<keys.length; i++) {
-          AsyncStorage.getItem(keys[i])
-            .then(
-              ((key, event) => {
-                event = JSON.parse(event);
-                event.uuid=key;
-                var newEvents = this.state.events.concat(event);
-                this.setState({
-                  events: newEvents,
-                });
-                this.search(this.state.name);
-              }).bind(this, keys[i])
-            )
-            .catch((error) => {
-              console.log(error);
-            })
-            .done();
-        }
+        Promise.all(keys.map((key) => {return AsyncStorage.getItem(key);}))
+          .then((events) => { 
+            this.setState({events: events.map(JSON.parse)});
+            this.search(this.state.name);
+          })
+          .catch((err) => {console.log(err);})
+          .done();
       })
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch((err) => {console.log(err);})
       .done();
   },
   editEvent: function(event) {

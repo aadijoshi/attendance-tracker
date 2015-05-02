@@ -32,17 +32,20 @@ var Event = React.createClass({
     console.log(this.props);
   },
   store: function(newSwiped) {
-    var storing = {name: this.state.name, date: this.state.date, swiped: newSwiped};
+    var storing = {
+      name: this.state.name, 
+      date: this.state.date, 
+      swiped: newSwiped, 
+      uuid: this.state.uuid
+    };
     AsyncStorage.setItem(this.state.uuid, JSON.stringify(storing))
       .then(() => {
         this.setState({
           swiped: newSwiped,
           dataSource: this.state.dataSource.cloneWithRows(newSwiped),
-        })
+        });
       })
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch((err) => {console.log(err);})
       .done();
   },
   onSwipe: function() {
