@@ -13,38 +13,36 @@ var {
   AsyncStorage,
 } = React;
 
-
 var Event = React.createClass({
   getInitialState: function() {
+    console.log(this.props);
+    console.log(this.props.key ? this.props.key : guid());
     return {
       name: this.props.name,
-      date: this.props.state,
-      ids: this.props.ids,
+      date: this.props.date,
+      swiped: this.props.swiped,
+      key: this.props.key ? this.props.key : guid(),
       dataSource: 
         new ListView.DataSource({
           rowHasChanged: (row1, row2) => row1 !== row2,
-        }).cloneWithRows(this.props.ids),
+        }).cloneWithRows(this.props.swiped),
     }
   },
-  componentWillMount: function() {
-    this.setState({
-      key: guid()
-    });
-  },
-  home: function() {
+  goHome: function() {
     this.props.navigator.push({
       title: "Home",
-      component: Home,
+      component: require('./Home.js'),
     });
   },
-  store: function(newIds) {
-    console.log(JSON.stringify(this.state));
-    AsyncStorage.setItem(this.state.key, JSON.stringify(this.state))
+  store: function(newSwiped) {
+    var storing = {name: this.state.name, date: this.state.date, swiped: newSwiped};
+    AsyncStorage.setItem(this.state.key, JSON.stringify(storing))
       .then(() => {
         this.setState({
-          ids: newIds,
-          dataSource: this.state.dataSource.cloneWithRows(newIds),
+          swiped: newSwiped,
+          dataSource: this.state.dataSource.cloneWithRows(newSwiped),
         })
+        console.log(this.state);
       })
       .catch((error) => {
         console.log(error);
@@ -52,12 +50,15 @@ var Event = React.createClass({
       .done();
   },
   onSwipe: function() {
-    this.store(this.state.ids.concat(["yay"]));
+    this.store(this.state.swiped.concat(["yay"]));
+  },
+  submitName: function() {
+    this.store(this.state.swiped);
   },
   deleteID: function(id) {
-    var temp_ids = this.state.ids.slice();
-    temp_ids.splice(this.state.ids.indexOf(id), 1);
-    this.store(temp_ids);
+    var tmp_swiped = this.state.swiped.slice();
+    tmp_swiped.splice(this.state.swiped.indexOf(id), 1);
+    this.store(tmp_swiped);
   },
   renderName: function(id) {
     return (
@@ -77,17 +78,17 @@ var Event = React.createClass({
           autoFocus={true}
           clearButtonMode='while-editing'
           onChangeText={(text) => this.setState({name: text})}
-          onSubmitEditing={()=>this.store}
+          onSubmitEditing={this.submitName}
           placeholder="Event Name"
           value={this.state.name}
           returnKeyType='done'
           keyboardType='default'
         />
-        <Text>{this.props.date.toDateString()}</Text>
+        <Text>{this.props.date}</Text>
         <TouchableHighlight onPress={this.onSwipe}>
           <Text>Swipe</Text>
         </TouchableHighlight>
-        <TouchableHighlight onPress={this.home}>
+        <TouchableHighlight onPress={this.goHome}>
           <Text>Home</Text>
         </TouchableHighlight>
         <ListView

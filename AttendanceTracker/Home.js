@@ -8,32 +8,28 @@ var {
   TouchableHighlight,
 } = React;
 
-var Search = require('./Search.js');
-var Event = require('./Event.js');
-var Sync = require('./Sync.js');
-
 var Home = React.createClass({
 	newEvent: function() {
 		this.props.navigator.push({
 			title: "New Event",
-			component: Event,
+			component: require('./Event.js'),
 			passProps: {
-				name: null,
-				date: new Date(),
-				ids: [],
+				name: "",
+				date: new Date().toDateString(),
+				swiped: [],
 			},
 		});
 	},
 	editEvent: function() {
 		this.props.navigator.push({
 			title: "Edit Event",
-			component: Search,
+			component: require('./Search.js'),
 		});
 	},
 	syncEvents: function() {
 		this.props.navigator.push({
 			title: "Sync Events",
-			component: Sync,
+			component: require('./Sync.js'),
 		});
 	},
 	render: function() {

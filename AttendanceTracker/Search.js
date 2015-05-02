@@ -8,25 +8,65 @@ var {
   TextInput,
   ListView,
   TouchableHighlight,
+  AsyncStorage,
 } = React;
 
 var Search = React.createClass({
   getInitialState: function () {
-    var ds = new ListView.DataSource({
-        rowHasChanged: (row1, row2) => row1 !== row2,
-      });
     return {
-      dataSource: ds.cloneWithRows(MOCK_EVENTS),
+      name: "",
+      events: [],
+      dataSource: 
+        new ListView.DataSource({
+          rowHasChanged: (row1, row2) => row1 !== row2,
+        }),
     }
   },
-  onSubmitHandler: function(event) {
-    console.log("Search onSubmitHandler");
-    console.log(event);
-    if (this.props.targetTab == "attendanceTab") {
-      this.props.onSubmitHandler(this.props.targetTab, event, false, true);
-    } else if (this.props.targetTab == "editTab") {
-      this.props.onSubmitHandler(this.props.targetTab, event, true);
-    }
+  componentWillMount: function () {
+    AsyncStorage.getAllKeys()
+      .then((keys) => {
+        for (var i = 0; i<keys.length; i++) {
+          AsyncStorage.getItem(keys[i])
+            .then(
+              ((key, event) => {
+                event = JSON.parse(event);
+                event.key=key;
+                console.log(event);
+                var newEvents = this.state.events.concat(event);
+                this.setState({
+                  events: newEvents,
+                });
+                this.search(this.state.name);
+              }).bind(this, keys[i])
+            )
+            .catch((error) => {
+              console.log(error);
+            })
+            .done();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .done();
+  },
+  editEvent: function(event) {
+    this.props.navigator.push({
+      title: "Edit Event",
+      component: require('./Event.js'),
+      passProps: {
+        name: event.name,
+        date: event.date,
+        swiped: event.swiped,
+        key: event.key,
+      },
+    });
+  },
+  goHome: function() {
+    this.props.navigator.push({
+      title: "Home",
+      component: require('./Home.js'),
+    });
   },
   render: function() {
     return (
@@ -35,6 +75,9 @@ var Search = React.createClass({
           {this.props.title}
         </Text>
         <View>
+        <TouchableHighlight onPress={this.goHome}>
+          <Text>Home</Text>
+        </TouchableHighlight>
           <TextInput
             style={styles.input}
             autoFocus={false}
@@ -55,21 +98,24 @@ var Search = React.createClass({
   },
   renderEvent: function(event) {
     return (
-      <TouchableHighlight onPress={this.onSubmitHandler.bind(this, event)}>
+      <TouchableHighlight onPress={this.editEvent.bind(this, event)}>
         <View>
-          <Text>{event.name}</Text>
-          <Text>{event.date.toDateString()}</Text>
-          <Text>{event.ids.length}</Text>
+          <Text>Name: {event.name}</Text>
+          <Text>Date: {event.date}</Text>
+          <Text>Number of Attendees: {event.swiped.length}</Text>
         </View>
       </TouchableHighlight>
     );
   },
   search: function(text) {
     this.setState({
-      eventName: text,
+      name: text,
       dataSource: this.state.dataSource.cloneWithRows(
-        MOCK_EVENTS.filter(
-          (event) => event.name.toLowerCase().indexOf(text.toLowerCase()) != -1
+        this.state.events.filter(
+          (event) => {
+            console.log(event);
+            return event.name.toLowerCase().indexOf(text.toLowerCase()) != -1;
+          }
         )
       ),
     });

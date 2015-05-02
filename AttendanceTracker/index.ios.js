@@ -12,34 +12,6 @@ var {
   StyleSheet,
 } = React;
 
-
-var MOCK_EVENTS =
-[
-  {
-    name: "Karting",
-    date: new Date(2015, 1, 10, 0, 0, 0, 0),
-    ids: [
-      "N1",
-      "N22",
-      "N333",
-      "N444"
-      ]
-  },
-  {
-    name: "Archery",
-    date: new Date(2015, 2, 20, 0, 0, 0, 0),
-    ids: [
-      "N4444",
-      "N1",
-      ]
-  },
-  {
-    name: "Wakeboarding",
-    date: new Date(2015, 3, 30, 0, 0, 0, 0),
-    ids: []
-  },
-];
-
 var styles = StyleSheet.create({
   navigator: {
     flex: 1,
