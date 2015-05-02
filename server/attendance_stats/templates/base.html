@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{% block title %}Attendance Tracker{% endblock %}</title>
+</head>
+
+<body>
+
+{% block content %}{% endblock %}
+
+{% load static %}
+<!-- Bootstrap -->
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Include individual scripts and css here for each template -->
+{% block individual_static %}{% endblock %}
+</body>
