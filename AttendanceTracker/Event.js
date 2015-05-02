@@ -16,33 +16,29 @@ var {
 var Event = React.createClass({
   getInitialState: function() {
     console.log(this.props);
-    console.log(this.props.key ? this.props.key : guid());
     return {
       name: this.props.name,
       date: this.props.date,
       swiped: this.props.swiped,
-      key: this.props.key ? this.props.key : guid(),
+      storageKey: this.props.storageKey == "" ? guid() : this.props.storageKey,
       dataSource: 
         new ListView.DataSource({
           rowHasChanged: (row1, row2) => row1 !== row2,
         }).cloneWithRows(this.props.swiped),
     }
   },
-  goHome: function() {
-    this.props.navigator.push({
-      title: "Home",
-      component: require('./Home.js'),
-    });
+  componentDidMount: function() {
+    console.log(this.state);
+    console.log(this.props);
   },
   store: function(newSwiped) {
     var storing = {name: this.state.name, date: this.state.date, swiped: newSwiped};
-    AsyncStorage.setItem(this.state.key, JSON.stringify(storing))
+    AsyncStorage.setItem(this.state.storageKey, JSON.stringify(storing))
       .then(() => {
         this.setState({
           swiped: newSwiped,
           dataSource: this.state.dataSource.cloneWithRows(newSwiped),
         })
-        console.log(this.state);
       })
       .catch((error) => {
         console.log(error);
@@ -51,6 +47,13 @@ var Event = React.createClass({
   },
   onSwipe: function() {
     this.store(this.state.swiped.concat(["yay"]));
+  },
+  goHome: function() {
+    if (this.props.editing) {
+      this.props.navigator.popN(2);
+    } else {
+      this.props.navigator.pop();
+    }
   },
   submitName: function() {
     this.store(this.state.swiped);
@@ -71,7 +74,7 @@ var Event = React.createClass({
     return (
        <View style={styles.container}>
         <Text style={styles.title}>
-          Create Event
+          {this.props.route.title}
         </Text>
         <TextInput
           style={styles.input}

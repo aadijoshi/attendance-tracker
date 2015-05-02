@@ -30,13 +30,13 @@ var Search = React.createClass({
             .then(
               ((key, event) => {
                 event = JSON.parse(event);
-                event.key=key;
-                console.log(event);
+                event.storageKey=key;
                 var newEvents = this.state.events.concat(event);
                 this.setState({
                   events: newEvents,
                 });
                 this.search(this.state.name);
+                console.log(this.state);
               }).bind(this, keys[i])
             )
             .catch((error) => {
@@ -50,7 +50,12 @@ var Search = React.createClass({
       })
       .done();
   },
+  componentDidMount: function() {
+    console.log(this.state);
+    console.log(this.props);
+  },
   editEvent: function(event) {
+    console.log(event);
     this.props.navigator.push({
       title: "Edit Event",
       component: require('./Event.js'),
@@ -58,24 +63,19 @@ var Search = React.createClass({
         name: event.name,
         date: event.date,
         swiped: event.swiped,
-        key: event.key,
+        storageKey: event.storageKey,
+        editing: true,
       },
-    });
-  },
-  goHome: function() {
-    this.props.navigator.push({
-      title: "Home",
-      component: require('./Home.js'),
     });
   },
   render: function() {
     return (
        <View style={styles.container}>
         <Text style={styles.title}>
-          {this.props.title}
+          {this.props.route.title}
         </Text>
         <View>
-        <TouchableHighlight onPress={this.goHome}>
+        <TouchableHighlight onPress={this.props.navigator.pop}>
           <Text>Home</Text>
         </TouchableHighlight>
           <TextInput
@@ -84,7 +84,7 @@ var Search = React.createClass({
             clearButtonMode='while-editing'
             onChangeText={this.search}
             placeholder='Event Name'
-            returnKeyType='next'
+            returnKeyType='done'
             keyboardType='default'
           />
           <ListView
@@ -113,7 +113,6 @@ var Search = React.createClass({
       dataSource: this.state.dataSource.cloneWithRows(
         this.state.events.filter(
           (event) => {
-            console.log(event);
             return event.name.toLowerCase().indexOf(text.toLowerCase()) != -1;
           }
         )

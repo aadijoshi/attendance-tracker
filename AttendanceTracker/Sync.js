@@ -16,12 +16,6 @@ var Sync = React.createClass({
 			loading: 0,
 		}
 	},
-	goHome: function() {
-    this.props.navigator.push({
-      title: "Home",
-      component: require('./Home.js'),
-    });
-  },
   componentWillMount: function () {
  	this.setState({
  		loading: 1,
@@ -80,7 +74,7 @@ var Sync = React.createClass({
 	render: function() {
     	return (
     		<View style={styles.container}>
-	    		<TouchableHighlight onPress={this.goHome}>
+	    		<TouchableHighlight onPress={this.props.navigator.pop}>
 		        	<Text>Home</Text>
 		        </TouchableHighlight>
 				<TouchableHighlight onPress={this.sync}>
