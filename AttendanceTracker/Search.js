@@ -36,7 +36,6 @@ var Search = React.createClass({
                   events: newEvents,
                 });
                 this.search(this.state.name);
-                console.log(this.state);
               }).bind(this, keys[i])
             )
             .catch((error) => {
@@ -50,12 +49,7 @@ var Search = React.createClass({
       })
       .done();
   },
-  componentDidMount: function() {
-    console.log(this.state);
-    console.log(this.props);
-  },
   editEvent: function(event) {
-    console.log(event);
     this.props.navigator.push({
       title: "Edit Event",
       component: require('./Event.js'),
@@ -67,6 +61,21 @@ var Search = React.createClass({
         editing: true,
       },
     });
+  },
+  deleteEvent: function(event) {
+    AsyncStorage.removeItem(event.storageKey)
+      .then(() => {
+        var tmp_events = this.state.events.slice();
+        tmp_events.splice(this.state.events.indexOf(event), 1);
+        this.setState({
+          events: tmp_events,
+        });
+        this.search(this.state.name);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .done();
   },
   render: function() {
     return (
@@ -98,6 +107,7 @@ var Search = React.createClass({
   },
   renderEvent: function(event) {
     return (
+      <View>
       <TouchableHighlight onPress={this.editEvent.bind(this, event)}>
         <View>
           <Text>Name: {event.name}</Text>
@@ -105,6 +115,10 @@ var Search = React.createClass({
           <Text>Number of Attendees: {event.swiped.length}</Text>
         </View>
       </TouchableHighlight>
+      <TouchableHighlight onPress={this.deleteEvent.bind(this, event)}>
+        <Text>Delete</Text>
+      </TouchableHighlight>
+      </View>
     );
   },
   search: function(text) {
