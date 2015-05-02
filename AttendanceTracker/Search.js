@@ -8,40 +8,92 @@ var {
   TextInput,
   ListView,
   TouchableHighlight,
+  AsyncStorage,
 } = React;
 
 var Search = React.createClass({
   getInitialState: function () {
-    var ds = new ListView.DataSource({
-        rowHasChanged: (row1, row2) => row1 !== row2,
-      });
     return {
-      dataSource: ds.cloneWithRows(MOCK_EVENTS),
+      name: "",
+      events: [],
+      dataSource: 
+        new ListView.DataSource({
+          rowHasChanged: (row1, row2) => row1 !== row2,
+        }),
     }
   },
-  onSubmitHandler: function(event) {
-    console.log("Search onSubmitHandler");
-    console.log(event);
-    if (this.props.targetTab == "attendanceTab") {
-      this.props.onSubmitHandler(this.props.targetTab, event, false, true);
-    } else if (this.props.targetTab == "editTab") {
-      this.props.onSubmitHandler(this.props.targetTab, event, true);
-    }
+  componentWillMount: function () {
+    AsyncStorage.getAllKeys()
+      .then((keys) => {
+        for (var i = 0; i<keys.length; i++) {
+          AsyncStorage.getItem(keys[i])
+            .then(
+              ((key, event) => {
+                event = JSON.parse(event);
+                event.uuid=key;
+                var newEvents = this.state.events.concat(event);
+                this.setState({
+                  events: newEvents,
+                });
+                this.search(this.state.name);
+              }).bind(this, keys[i])
+            )
+            .catch((error) => {
+              console.log(error);
+            })
+            .done();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .done();
+  },
+  editEvent: function(event) {
+    this.props.navigator.push({
+      title: "Edit Event",
+      component: require('./Event.js'),
+      passProps: {
+        name: event.name,
+        date: event.date,
+        swiped: event.swiped,
+        uuid: event.uuid,
+        editing: true,
+      },
+    });
+  },
+  deleteEvent: function(event) {
+    AsyncStorage.removeItem(event.uuid)
+      .then(() => {
+        var tmp_events = this.state.events.slice();
+        tmp_events.splice(this.state.events.indexOf(event), 1);
+        this.setState({
+          events: tmp_events,
+        });
+        this.search(this.state.name);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .done();
   },
   render: function() {
     return (
        <View style={styles.container}>
         <Text style={styles.title}>
-          {this.props.title}
+          {this.props.route.title}
         </Text>
         <View>
+        <TouchableHighlight onPress={this.props.navigator.pop}>
+          <Text>Home</Text>
+        </TouchableHighlight>
           <TextInput
             style={styles.input}
             autoFocus={false}
             clearButtonMode='while-editing'
             onChangeText={this.search}
             placeholder='Event Name'
-            returnKeyType='next'
+            returnKeyType='done'
             keyboardType='default'
           />
           <ListView
@@ -55,21 +107,28 @@ var Search = React.createClass({
   },
   renderEvent: function(event) {
     return (
-      <TouchableHighlight onPress={this.onSubmitHandler.bind(this, event)}>
+      <View>
+      <TouchableHighlight onPress={this.editEvent.bind(this, event)}>
         <View>
-          <Text>{event.name}</Text>
-          <Text>{event.date.toDateString()}</Text>
-          <Text>{event.ids.length}</Text>
+          <Text>Name: {event.name}</Text>
+          <Text>Date: {event.date}</Text>
+          <Text>Number of Attendees: {event.swiped.length}</Text>
         </View>
       </TouchableHighlight>
+      <TouchableHighlight onPress={this.deleteEvent.bind(this, event)}>
+        <Text>Delete</Text>
+      </TouchableHighlight>
+      </View>
     );
   },
   search: function(text) {
     this.setState({
-      eventName: text,
+      name: text,
       dataSource: this.state.dataSource.cloneWithRows(
-        MOCK_EVENTS.filter(
-          (event) => event.name.toLowerCase().indexOf(text.toLowerCase()) != -1
+        this.state.events.filter(
+          (event) => {
+            return event.name.toLowerCase().indexOf(text.toLowerCase()) != -1;
+          }
         )
       ),
     });
