@@ -15,7 +15,7 @@ var Home = React.createClass({
 			component: require('./Event.js'),
 			passProps: {
 				name: "",
-				storageKey: "",
+				uuid: "",
 				date: new Date().toDateString(),
 				swiped: [],
 			},

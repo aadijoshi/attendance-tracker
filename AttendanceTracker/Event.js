@@ -1,6 +1,6 @@
 var React = require('react-native');
 var styles = require('./index.ios.js');
-var guid = require('./guid.js');
+var uuid_gen = require('node-uuid');
 
 var {
   StyleSheet,
@@ -20,7 +20,7 @@ var Event = React.createClass({
       name: this.props.name,
       date: this.props.date,
       swiped: this.props.swiped,
-      storageKey: this.props.storageKey == "" ? guid() : this.props.storageKey,
+      uuid: this.props.uuid == "" ? uuid_gen.v1() : this.props.uuid,
       dataSource: 
         new ListView.DataSource({
           rowHasChanged: (row1, row2) => row1 !== row2,
@@ -33,7 +33,7 @@ var Event = React.createClass({
   },
   store: function(newSwiped) {
     var storing = {name: this.state.name, date: this.state.date, swiped: newSwiped};
-    AsyncStorage.setItem(this.state.storageKey, JSON.stringify(storing))
+    AsyncStorage.setItem(this.state.uuid, JSON.stringify(storing))
       .then(() => {
         this.setState({
           swiped: newSwiped,
@@ -81,7 +81,7 @@ var Event = React.createClass({
           autoFocus={true}
           clearButtonMode='while-editing'
           onChangeText={(text) => this.setState({name: text})}
-          onSubmitEditing={this.submitName}
+          onEndEditing={this.submitName}
           placeholder="Event Name"
           value={this.state.name}
           returnKeyType='done'

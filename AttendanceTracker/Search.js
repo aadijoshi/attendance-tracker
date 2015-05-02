@@ -30,7 +30,7 @@ var Search = React.createClass({
             .then(
               ((key, event) => {
                 event = JSON.parse(event);
-                event.storageKey=key;
+                event.uuid=key;
                 var newEvents = this.state.events.concat(event);
                 this.setState({
                   events: newEvents,
@@ -57,13 +57,13 @@ var Search = React.createClass({
         name: event.name,
         date: event.date,
         swiped: event.swiped,
-        storageKey: event.storageKey,
+        uuid: event.uuid,
         editing: true,
       },
     });
   },
   deleteEvent: function(event) {
-    AsyncStorage.removeItem(event.storageKey)
+    AsyncStorage.removeItem(event.uuid)
       .then(() => {
         var tmp_events = this.state.events.slice();
         tmp_events.splice(this.state.events.indexOf(event), 1);
