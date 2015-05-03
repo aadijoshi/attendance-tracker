@@ -8,7 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import "RCTBridgeModule.h"
-#import "RCTLog.h"
+
+@class MTSCRA;
 
 @interface CardReaderManager : NSObject <RCTBridgeModule>
+
+#pragma mark -
+#pragma mark MTSCRA Property
+#pragma mark -
+
+@property (nonatomic, strong) MTSCRA *mtSCRALib;
+
 @end

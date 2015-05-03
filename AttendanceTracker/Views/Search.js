@@ -1,5 +1,5 @@
 var React = require('react-native');
-var styles = require('./index.ios.js');
+var styles = require('../index.ios.js');
 
 var {
   StyleSheet,

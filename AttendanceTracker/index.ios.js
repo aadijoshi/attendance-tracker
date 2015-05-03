@@ -35,18 +35,17 @@ var styles = StyleSheet.create({
 
 module.exports = styles;
 
-var Home = require('./Home.js');
+var Home = require('./Views/Home.js');
 
+var CardReaderManager = require('NativeModules').CardReaderManager;
 
-//var CardReaderManager = require('NativeModules').CardReaderManager;
-//
-//CardReaderManager.test((error, msg) => {
-//  if (error) {
-//    console.error(error);
-//  } else {
-//    console.log(msg);
-//  }
-//});
+CardReaderManager.test((error, msg) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(msg);
+  }
+});
 
 
 var AttendanceTracker = React.createClass({
