@@ -1,0 +1,22 @@
+{
+  "name": "attendance-tracker",
+  "version": "0.0.1",
+  "homepage": "https://github.com/moiri-gamboni/attendance-tracker",
+  "authors": [
+    "Oleg Grishin <og402@nyu.edu>",
+    "Moiri Gamboni <mg3794@nyu.edu"
+  ],
+  "license": "GNU",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "html5-boilerplate": "~5.2.0"
+  }
+}

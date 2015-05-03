@@ -86,6 +86,4 @@ def sync(request):
 
 @login_required
 def index(request):
-    # redirect based on whether a user is a display or not
-    print "index"
-    return HttpResponse("kewl", status=200, content_type='text/plain')
+    return render(request, 'index/index.html', {})

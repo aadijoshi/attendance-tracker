@@ -41,3 +41,5 @@ lib64
 *.pyc
 *.pyo
 sftp-config.json
+
+server/static/bower_components
