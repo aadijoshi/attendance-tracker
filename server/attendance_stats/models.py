@@ -40,12 +40,12 @@ class Event(models.Model):
 
 class Semester(models.Model):
     TERM = (
-        ('S', 'Spring'),
-        ('F', 'Fall'),
-        ('J', 'J-Term'),
-        ('M', 'Summer')
+        ('Spring', 'Spring'),
+        ('Fall', 'Fall'),
+        ('J-Term', 'J-Term'),
+        ('Summer', 'Summer')
     )
-    term = models.CharField(max_length=1,
+    term = models.CharField(max_length=6,
                                 choices=TERM)
     year = models.PositiveSmallIntegerField()
     start_date = models.DateField()

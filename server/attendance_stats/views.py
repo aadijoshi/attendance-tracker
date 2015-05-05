@@ -89,6 +89,7 @@ def sync(request):
 @login_required
 def semesters(request):
     semesters = Semester.objects.order_by('end_date')
+    print semesters
 
     response = {
         'semesters' : serializers.serialize('json', semesters)
@@ -101,7 +102,10 @@ def semesters(request):
         current = semesters[0]
         # find most recent semester
         for semester in semesters:
-            if today < semester.end_date:
+            if today > semester.start_date and today < semester.end_date:
+                current = semester
+                break
+            elif today < semester.start_date:
                 break
             else:
                 current = semester
