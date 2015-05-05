@@ -6,9 +6,11 @@ from django.contrib.auth.decorators import login_required
 
 from attendance_stats.models import *
 
-from datetime import datetime
+import datetime
 
 from django.views.decorators.csrf import csrf_exempt
+
+from django.core import serializers
 
 # event synching end-point
 @csrf_exempt
@@ -82,7 +84,42 @@ def sync(request):
         return HttpResponseBadRequest("Has to be a POST request",
             content_type='text/plain')
 
-# Decorators for login checks
+
+# API endpoint for listing semesters
+@login_required
+def semesters(request):
+    semesters = Semester.objects.order_by('end_date')
+
+    response = {
+        'semesters' : serializers.serialize('json', semesters)
+    }
+
+    if len(semesters) > 0:
+        today = datetime.date.today()
+
+        # take first semester as a current
+        current = semesters[0]
+        # find most recent semester
+        for semester in semesters:
+            if today < semester.end_date:
+                break
+            else:
+                current = semester
+
+        response.update({
+            'current' : serializers.serialize('json', [current])
+        })
+
+    else:
+        response.update({
+            'current' : []
+        })
+
+
+
+    data = json.dumps(response)
+
+    return HttpResponse(data, content_type='application/json')
 
 @login_required
 def index(request):
