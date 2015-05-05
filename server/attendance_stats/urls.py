@@ -10,4 +10,7 @@ urlpatterns = patterns('',
 
     # endpoint for getting semesters
     url(r'^semesters/json$', views.semesters, name='semesters'),
+
+    # endpoint for getting events
+    url(r'^events/json$', views.events, name='events'),
 )

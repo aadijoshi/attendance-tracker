@@ -12,6 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.core import serializers
 
+# constants
+
+DATE_FORMAT = "%Y-%m-%d"
+
 # event synching end-point
 @csrf_exempt
 def sync(request):
@@ -52,7 +56,7 @@ def sync(request):
             # delete Sat
             # date = date[4:]
             try:
-                date = datetime.strptime(date, "%a %b %d %Y").date()
+                date = datetime.datetime.strptime(date, "%a %b %d %Y").date()
             except ValueError:
                 return HttpResponseBadRequest("Can't parse 'date'")
 
@@ -65,11 +69,12 @@ def sync(request):
 
             event, created_event = Event.objects.get_or_create(uuid=uuid, name=name, date=date)
             participants = Student.objects.filter(event=event)
+            added = []
             for n_number in swiped:
                 participant, _ = Student.objects.get_or_create(n_number=n_number)
-                if participant not in participants:
+                if participant not in participants and participant not in added:
                     event.participants.add(participant)
-                    participants.append(participant)
+                    added.append(participant)
 
             return HttpResponse("{1} event: {0}"
                 .format(event, "Created" if created_event else "Updated"),
@@ -124,6 +129,46 @@ def semesters(request):
     data = json.dumps(response)
 
     return HttpResponse(data, content_type='application/json')
+
+
+# API endpoint for listing events
+@login_required
+def events(request):
+
+    data = request.GET.dict()
+
+    start = data.get('start', False)
+
+    if not start:
+         return HttpResponse("Needs 'start' parameter",
+             status=500,
+             content_type='text/plain')
+
+    end = data.get('end', False)
+
+    if not data.get('end', False):
+         return HttpResponse("Needs 'end' parameter",
+             status=500,
+             content_type='text/plain')
+
+    try:
+        start = datetime.datetime.strptime(start, DATE_FORMAT).date()
+        end = datetime.datetime.strptime(end, DATE_FORMAT).date()
+    except:
+        return HttpResponse("Wrong date format, should be {0}"
+            .format(DATE_FORMAT),
+            status=500,
+            content_type='text/plain')
+
+    events = Event.objects \
+        .filter(date__gte=start) \
+        .filter(date__lte=end) \
+        .order_by('-date')
+
+    response = json.dumps(serializers.serialize('json', events))
+
+    return HttpResponse(response, content_type='application/json')
+
 
 @login_required
 def index(request):
