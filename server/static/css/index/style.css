@@ -15,24 +15,31 @@
 }
 
 #loading .modal-body .glyphicon {
-    font-size: 30px;
+  font-size: 30px;
 }
 
 /*
-    Animate glyphicon (http://www.bootply.com/128062)
+  Override datepicker's weird behaviour
+*/
+.bootstrap-datetimepicker-widget {
+  left: inherit !important;
+}
+
+/*
+  Animate glyphicon (http://www.bootply.com/128062)
 */
 
 .glyphicon-refresh-animate {
-    -animation: spin .8s infinite linear;
-    -webkit-animation: spin2 .7s infinite linear;
+  -animation: spin .8s infinite linear;
+  -webkit-animation: spin2 .7s infinite linear;
 }
 
 @-webkit-keyframes spin2 {
-    from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
+  from { -webkit-transform: rotate(0deg);}
+  to { -webkit-transform: rotate(360deg);}
 }
 
 @keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
+  from { transform: scale(1) rotate(0deg);}
+  to { transform: scale(1) rotate(360deg);}
 }

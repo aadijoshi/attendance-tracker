@@ -33,11 +33,16 @@ Index | Attendance Tracker
             <label for="semesterInput">Semester</label>
             <select class="form-control" id="semesterInput">
             </select>
+        </div>
             <label for="startDatePicker">or from:</label>
+        <!-- Semidirty fix for the datepicker left inherit problem (see css) -->
+        <div class="form-group">
             <input type="text" class="form-control" id="startDatePicker" placeholder="Pick Date">
-            <label for="endDatePicker">to:</label>
+        </div>
+        <label for="endDatePicker">to:</label>
+        <div class="form-group">
             <input type="text" class="form-control" id="endDatePicker" placeholder="Pick Date">
-            </select>
+        </div>
             <button class="btn btn-default" id="applyDateRange"><span class="glyphicon glyphicon-refresh">&nbsp;Apply</button>
           </div>
         </form>

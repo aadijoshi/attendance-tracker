@@ -79,18 +79,31 @@ $(function(){
                     } else {
                         $("#startDatePicker").focus();
                     }
-
                 });
                 try {
                     current = JSON.parse(current);
+                    // just in case there are ever no events in the DB
                     if (current[0]) {
                         current = current[0];
                         $("#semesterInput").val(current.pk);
                         // trigger change to update dates
                         $("#semesterInput").trigger("change");
+                        // triger date pickers to include the dates
+                        $('#startDatePicker').data("DateTimePicker").date(
+                            moment($('#startDatePicker').val(), dateFormat)
+                        );
+                        $('#endDatePicker').data("DateTimePicker").date(
+                            moment($('#endDatePicker').val(), dateFormat)
+                        );
                         loadEvents();
+                    } else {
+                        $("#semesterInput").val(-1);
+                        $("#semesterInput").trigger("change");
+                        doneLoading();
+                        return;
                     }
                 } catch (e) {
+                    console.log(e);
                     loadingError("Error parsing current semester data received from server");
                 }
             } catch (e) {
@@ -217,6 +230,21 @@ $(function(){
     });
     $("#endDatePicker").on("focus", function() {
         $("#semesterInput").val(-1);
+    });
+
+
+    // Datepickers setup
+    $('#startDatePicker').datetimepicker({
+        format: dateFormat
+    });
+    $('#endDatePicker').datetimepicker({
+        format: dateFormat
+    });
+    $("#startDatePicker").on("dp.change", function (e) {
+        $('#endDatePicker').data("DateTimePicker").minDate(e.date);
+    });
+    $("#endDatePicker").on("dp.change", function (e) {
+        $('#startDatePicker').data("DateTimePicker").maxDate(e.date);
     });
 
     $('#loading').modal('show');
