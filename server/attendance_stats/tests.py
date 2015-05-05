@@ -1,3 +1,5 @@
 from django.test import TestCase
 
-# Create your tests here.
+# TO-DO
+# test for returning proper semester lists
+# test for adding a student

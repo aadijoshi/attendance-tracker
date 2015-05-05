@@ -17,6 +17,8 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.4",
-    "html5-boilerplate": "~5.2.0"
+    "html5-boilerplate": "~5.2.0",
+    "eonasdan-bootstrap-datetimepicker": "~4.7.14",
+    "underscore": "~1.8.3"
   }
 }
