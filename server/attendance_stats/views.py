@@ -81,7 +81,6 @@ def sync(request):
                 status=200,
                 content_type='text/plain')
         except Exception as e:
-            print str(e)
             return HttpResponse("Server error message: {0!s}".format(e),
                 status=500,
                 content_type='text/plain')
@@ -94,7 +93,6 @@ def sync(request):
 @login_required
 def semesters(request):
     semesters = Semester.objects.order_by('end_date')
-    print semesters
 
     response = {
         'semesters' : serializers.serialize('json', semesters)
@@ -130,7 +128,6 @@ def semesters(request):
 
     return HttpResponse(data, content_type='application/json')
 
-
 # API endpoint for listing events
 @login_required
 def events(request):
@@ -165,7 +162,18 @@ def events(request):
         .filter(date__lte=end) \
         .order_by('-date')
 
-    response = json.dumps(serializers.serialize('json', events))
+    students = set()
+
+    for event in events:
+        for participant in event.participants.all():
+            students.add(participant)
+
+    print students
+
+    response = json.dumps({
+        "events" : serializers.serialize('json', events),
+        "students" : serializers.serialize('json', students)
+    })
 
     return HttpResponse(response, content_type='application/json')
 
