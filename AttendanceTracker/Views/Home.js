@@ -33,6 +33,12 @@ var Home = React.createClass({
 			component: require('./Sync.js'),
 		});
 	},
+	test: function() {
+		this.props.navigator.push({
+			title: "Test",
+			component: require('./Test.js'),
+		});
+	},
 	render: function() {
     	return (
 			<View style={styles.container}>
@@ -45,6 +51,9 @@ var Home = React.createClass({
 				</TouchableHighlight>
 				<TouchableHighlight onPress={this.syncEvents}>
 					<Text>Sync</Text>
+				</TouchableHighlight>
+				<TouchableHighlight onPress={this.test}>
+					<Text>Test</Text>
 				</TouchableHighlight>
 			</View>
 		);

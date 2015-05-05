@@ -37,15 +37,7 @@ module.exports = styles;
 
 var Home = require('./Views/Home.js');
 
-var CardReaderManager = require('NativeModules').CardReaderManager;
 
-CardReaderManager.test((error, msg) => {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log(msg);
-  }
-});
 
 
 var AttendanceTracker = React.createClass({

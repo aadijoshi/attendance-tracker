@@ -13,10 +13,6 @@
 
 @interface CardReaderManager : NSObject <RCTBridgeModule>
 
-#pragma mark -
-#pragma mark MTSCRA Property
-#pragma mark -
-
-@property (nonatomic, strong) MTSCRA *mtSCRALib;
+@property (nonatomic, strong) MTSCRA *magTek;
 
 @end
