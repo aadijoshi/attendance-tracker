@@ -1,10 +1,10 @@
 from django.db import models
 
 class Student(models.Model):
-    n_number = models.IntegerField(primary_key=True)
+    n_number = models.IntegerField("N Number (N is 8)", primary_key=True)
     first_name = models.CharField(max_length=32, null=True, blank=True)
     last_name = models.CharField(max_length=32, null=True, blank=True)
-    net_id = models.CharField(max_length=16, null=True, blank=True)
+    net_id = models.CharField("Net ID", max_length=16, null=True, blank=True)
 
     FEMALE = 'F'
     MALE = 'M'
@@ -15,6 +15,8 @@ class Student(models.Model):
     gender = models.CharField(max_length=1,
                                 choices=GENDER, null=True, blank=True)
     year = models.IntegerField(null=True, blank=True)
+
+    gnu_student = models.BooleanField("GNU Student")
 
     def __str__(self):
         return "{0} {1} ({2!s})".format(
