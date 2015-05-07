@@ -231,13 +231,12 @@ $(function(){
         var tableElement = $("<table />", {
             id: tableId
         }).appendTo("#eventsTableContainter");
-        tableElement.addClass("table table-hover");
+        tableElement.addClass("table table-hover sortable");
         tableElement.append("\
             <thead> \
                 <th>Name</th> \
-                <th>Date</th> \
-                <th>Participants</th> \
-                <th>Attendance (estimated)</th> \
+                <th data-defaultsort='desc'>Date</th> \
+                <th>Estimated attendance</th> \
             </thead> \
             <tbody> \
             </tbody> \
@@ -249,9 +248,12 @@ $(function(){
             <tr id='<%= id %>''> \
                 <td><%= name %></td> \
                 <td><%= date %></td> \
-                <td><%= participants %></td> \
-                <td><%= attendance %></td> \
+                <td data-value='<%= participants %>'><%= attendance %></td> \
             </tr> \
+        ");
+
+        var attendanceText = _.template("\
+            <%= percentage %>% (<%= attended %>/" + students.length + ")\
         ");
 
         _.each(events, function (ev) {
@@ -260,9 +262,14 @@ $(function(){
                 name : ev.fields.name,
                 date : ev.fields.date,
                 participants : ev.fields.participants.length,
-                attendance : (ev.fields.participants.length/students.length* 100).toFixed(2)
+                attendance : attendanceText({
+                    percentage : (ev.fields.participants.length/students.length* 100).toFixed(2),
+                    attended : ev.fields.participants.length
+                })
             }));
         });
+
+        $.bootstrapSortable("applyLast");
 
     }
 
