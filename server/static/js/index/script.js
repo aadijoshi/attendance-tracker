@@ -15,9 +15,16 @@ $(function(){
     // To smoothen loading put intervals (or put to 0 for fastest speed)
     var loadingInterval = 1000;
     // To store dates of semesters globally
-    var semesters, events;
+    var semesters, events, students, students_dict;
     // Date format (if changes, need to be changed in several places)
     var dateFormat = "YYYY-MM-DD";
+
+    // Helper functions to get ID strings
+    var getEventId = function (id) {
+        return "event" + id;
+    }
+
+    // Logic starts here
 
     // Add delay to display the modal
     $('#loading').on('show.bs.modal', function (e) {
@@ -53,34 +60,45 @@ $(function(){
     // Load data from the server about semesters into the DOM
     var loadSemestersDOM = function(data) {
         semesters = data["semesters"];
-        var current = data["current"];
         if (semesters) {
+
             try {
                 semesters = JSON.parse(semesters);
-                var selectSemesterElement = _.template("<option value='<%= value %>'><%= name %></option>")
-                _.each(semesters, function (semester) {
-                    $("#semesterInput").append(selectSemesterElement({
-                        value : semester.pk,
-                        name : semester.fields.term + " " + semester.fields.year
-                    }));
-                });
+            } catch (e) {
+                console.log(e);
+                loadingError("Error parsing semesters data received from server");
+                return;
+            }
+
+            var selectSemesterElement = _.template("<option value='<%= value %>'><%= name %></option>")
+            _.each(semesters, function (semester) {
                 $("#semesterInput").append(selectSemesterElement({
-                    value : -1,
-                    name : "custom"
+                    value : semester.pk,
+                    name : semester.fields.term + " " + semester.fields.year
                 }));
-                $("#semesterInput").on("change", function(val) {
-                    var val = $("#semesterInput :selected").val();
-                    if (val != -1) {
-                        var semester = _.find(semesters, function(semester) {
-                            return semester.pk == val;
-                        });
-                        $("#startDatePicker").val(semester.fields.start_date);
-                        $("#endDatePicker").val(semester.fields.end_date);
-                    } else {
-                        $("#startDatePicker").focus();
-                    }
-                });
-                try {
+            });
+            $("#semesterInput").append(selectSemesterElement({
+                value : -1,
+                name : "custom"
+            }));
+            $("#semesterInput").on("change", function(val) {
+                var val = $("#semesterInput :selected").val();
+                if (val != -1) {
+                    var semester = _.find(semesters, function(semester) {
+                        return semester.pk == val;
+                    });
+                    $("#startDatePicker").val(semester.fields.start_date);
+                    $("#endDatePicker").val(semester.fields.end_date);
+                } else {
+                    $("#startDatePicker").focus();
+                }
+            });
+
+            try {
+                var current = data["current"];
+
+                if (current) {
+
                     current = JSON.parse(current);
                     // just in case there are ever no events in the DB
                     if (current[0]) {
@@ -102,15 +120,22 @@ $(function(){
                         doneLoading();
                         return;
                     }
-                } catch (e) {
-                    console.log(e);
-                    loadingError("Error parsing current semester data received from server");
+
+                } else {
+                    loadingError("Server returned unexpected data. No current semester");
+                    return;
                 }
+
             } catch (e) {
-                loadingError("Error parsing semesters data received from server");
+                console.log(e);
+                loadingError("Error parsing current semester data received from server");
+                return;
             }
+
+
         } else {
-            loadingError("Server returned unexpected data");
+            loadingError("Server returned unexpected data. No semesters info found");
+            return;
         }
     }
 
@@ -148,12 +173,97 @@ $(function(){
                 type : "text-success"
             }));
 
-            console.log(data);
+            loadAllGraphs(data);
 
-            // TO-DO
-
-            doneLoading();
         });
+    }
+
+    var loadAllGraphs = function (data) {
+
+        $("#loading .modal-body").append(getLoadingElement({
+            message : "Rendering all the needed graphs&hellip;",
+            type : "text-info"
+        }));
+
+        try {
+            if (data["students"]) {
+                students = JSON.parse(data["students"]);
+            } else {
+                loadingError("No data on students received from server");
+                return;
+            }
+
+            if (data["events"]) {
+                events = JSON.parse(data["events"]);
+            } else {
+                loadingError("No data on events received from server");
+                return;
+            }
+
+        } catch (e) {
+            console.log(e);
+            loadingError("Error parsing current semester data received from server");
+            return;
+        }
+
+        // TO-DO: here is the check and DOM update for no events/no students
+        console.log("Students:")
+        console.log(students);
+        console.log("Events:")
+        console.log(events);
+
+        // converts students to students dictionary for easy look up by n_number
+        var students_dict = _.object(_.map(students, function(item) {
+           return [item.pk, item.fields]
+        }));
+
+        console.log("Students dictionary:")
+        console.log(students_dict);
+
+        createEventsTable();
+
+        doneLoading();
+
+    }
+
+    var createEventsTable = function () {
+        var tableId = "eventsTableContainter";
+        var tableElement = $("<table />", {
+            id: tableId
+        }).appendTo("#eventsTableContainter");
+        tableElement.addClass("table table-hover");
+        tableElement.append("\
+            <thead> \
+                <th>Name</th> \
+                <th>Date</th> \
+                <th>Participants</th> \
+                <th>Attendance (estimated)</th> \
+            </thead> \
+            <tbody> \
+            </tbody> \
+        ");
+
+        tableElement = $("#" + tableId + " tbody");
+
+        var tableRowElement = _.template("\
+            <tr id='<%= id %>''> \
+                <td><%= name %></td> \
+                <td><%= date %></td> \
+                <td><%= participants %></td> \
+                <td><%= attendance %></td> \
+            </tr> \
+        ");
+
+        _.each(events, function (ev) {
+            tableElement.append(tableRowElement({
+                id : getEventId(ev.pk),
+                name : ev.fields.name,
+                date : ev.fields.date,
+                participants : ev.fields.participants.length,
+                attendance : (ev.fields.participants.length/students.length* 100).toFixed(2)
+            }));
+        });
+
     }
 
     var doneLoading = function () {
