@@ -6,11 +6,21 @@ Index | Attendance Tracker
 
 {% block scripts %}
 {% load staticfiles %}
-<script src="{% static 'js/index/script.js' %}"></script>
-<link rel="stylesheet" href="{% static 'css/index/style.css' %}">
+<!-- Momentjs for datepicker dependencies and easier date manipulations -->
 <script type="text/javascript" src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
+
+<!-- Datepicker for formated date selection -->
 <script type="text/javascript" src="{% static 'bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
 <link rel="stylesheet" href="{% static 'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css' %}" />
+
+<!-- Highcharts for statistics rendering -->
+<script type="text/javascript" src="{% static 'bower_components/highcharts/highcharts.js' %}"></script>
+
+<!-- Our main script for loading everything -->
+<script src="{% static 'js/index/script.js' %}"></script>
+<!-- Our main stylesheet for random alterations -->
+<link rel="stylesheet" href="{% static 'css/index/style.css' %}">
+
 {% endblock %}
 
 {% block content %}
@@ -46,6 +56,12 @@ Index | Attendance Tracker
             <button class="btn btn-default" id="applyDateRange"><span class="glyphicon glyphicon-refresh">&nbsp;Apply</button>
           </div>
         </form>
+    </div>
+</div>
+
+<!-- Main elements table container -->
+<div class="row">
+    <div class="col-md-12" id="eventsTableContainter">
     </div>
 </div>
 
