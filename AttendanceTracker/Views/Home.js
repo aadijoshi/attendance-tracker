@@ -1,8 +1,7 @@
 var React = require('react-native');
-var styles = require('../index.ios.js');
+var styles = require('./styles.js');
 
 var {
-  StyleSheet,
   Text,
   View,
   TouchableHighlight,
@@ -16,7 +15,7 @@ var Home = React.createClass({
 			passProps: {
 				name: "",
 				uuid: "",
-				date: new Date().toDateString(),
+				date: new Date(),
 				swiped: [],
 			},
 		});
@@ -41,20 +40,34 @@ var Home = React.createClass({
 	},
 	render: function() {
     	return (
-			<View style={styles.container}>
-				<Text style={styles.title}>Attendance Tracker</Text>
-				<TouchableHighlight onPress={this.newEvent}>
-					<Text>New</Text>
-				</TouchableHighlight>
-				<TouchableHighlight onPress={this.editEvent}>
-					<Text>Edit</Text>
-				</TouchableHighlight>
-				<TouchableHighlight onPress={this.syncEvents}>
-					<Text>Sync</Text>
-				</TouchableHighlight>
-				<TouchableHighlight onPress={this.test}>
-					<Text>Test</Text>
-				</TouchableHighlight>
+			<View style={styles.homeContainer}>
+				<View style={styles.homeTitleContainer}>
+					<Text style={[styles.text, styles.title]}>attendance</Text>
+					<Text style={[styles.text, styles.title]}>tracker</Text>
+				</View>
+				<View style={styles.homeButtonsContainer}>
+					<TouchableHighlight 
+						style={styles.button} 
+						onPress={this.newEvent}
+						underlayColor='#ffffff'
+					>
+						<Text style={styles.text}>new event</Text>
+					</TouchableHighlight>
+					<TouchableHighlight 
+						style={styles.button} 
+						onPress={this.editEvent}
+						underlayColor='#ffffff'
+					>
+						<Text style={styles.text}>update event</Text>
+					</TouchableHighlight>
+					<TouchableHighlight 
+						style={styles.button} 
+						onPress={this.syncEvents}
+						underlayColor='#ffffff'
+					>
+						<Text style={styles.text}>sync data</Text>
+					</TouchableHighlight>
+				</View>
 			</View>
 		);
 	},

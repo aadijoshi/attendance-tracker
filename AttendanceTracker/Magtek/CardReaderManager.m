@@ -24,8 +24,6 @@ RCT_EXPORT_METHOD(initMagTek)
   [self magTekToggleObservers:true];
   [self.magTek setDeviceType:MAGTEKIDYNAMO];
   [self.magTek setDeviceProtocolString:(@"com.magtek.idynamo")];
-  [self.magTek openDevice];
-  [self.magTek closeDevice];
   [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
                                                   body:@{
                                                          @"msg": @"Initialized iDynamo",

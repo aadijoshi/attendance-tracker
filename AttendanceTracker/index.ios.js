@@ -5,40 +5,13 @@
  'use strict';
 
 var React = require('react-native');
+var Home = require('./Views/Home.js');
+var styles = require('./Views/styles.js');
 
 var {
   AppRegistry,
   NavigatorIOS,
-  StyleSheet,
 } = React;
-
-var styles = StyleSheet.create({
-  navigator: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    height: 30
-  },
-  title: {
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-  }
-});
-
-module.exports = styles;
-
-var Home = require('./Views/Home.js');
-
-
-
 
 var AttendanceTracker = React.createClass({
   getInitialState: function() {
@@ -50,22 +23,18 @@ var AttendanceTracker = React.createClass({
   render: function() {
     return (
       <NavigatorIOS
-        style={styles.container}
+        style={styles.navigator}
         initialRoute={{
+          title: "Home",
           component: Home,
-          title: "Home", 
-          passProps: {},
         }}
-        navigationBarHidden={true}
+        navigationBarHidden={false}
+        barTintColor="white"
+        tintColor="#663399"
       />
     );
   },
 });
-
-
-
-
-
 
 AppRegistry.registerComponent('AttendanceTracker', () => AttendanceTracker);
 
