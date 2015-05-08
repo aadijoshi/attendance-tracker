@@ -36,7 +36,7 @@
 		916F41591AF90F4C00B4B06C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F41581AF90F4C00B4B06C /* Foundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		916F415B1AF90F5300B4B06C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F415A1AF90F5300B4B06C /* CoreGraphics.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		916F415D1AF90F5900B4B06C /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F415C1AF90F5900B4B06C /* ExternalAccessory.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		916F41621AF9101000B4B06C /* libMTSCRA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F41611AF9101000B4B06C /* libMTSCRA.a */; settings = {ATTRIBUTES = (Weak, ); }; };
+		916F41621AF9101000B4B06C /* libMTSCRA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F41611AF9101000B4B06C /* libMTSCRA.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		916F41651AF9101D00B4B06C /* CardReaderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 916F41641AF9101D00B4B06C /* CardReaderManager.m */; };
 /* End PBXBuildFile section */
 

@@ -8,11 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "RCTBridgeModule.h"
+#import "MTSCRA.h"
 
 @class MTSCRA;
 
-@interface CardReaderManager : NSObject <RCTBridgeModule>
+@interface CardReaderManager : NSObject <RCTBridgeModule, MTSCRAEventDelegate>
 
 @property (nonatomic, strong) MTSCRA *magTek;
+@property dispatch_queue_t queue;
 
 @end
