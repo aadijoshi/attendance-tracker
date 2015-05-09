@@ -13,6 +13,10 @@ var {
   NavigatorIOS,
 } = React;
 
+var {
+  IndexStyles,
+} = styles;
+
 var AttendanceTracker = React.createClass({
   getInitialState: function() {
     return {
@@ -23,7 +27,7 @@ var AttendanceTracker = React.createClass({
   render: function() {
     return (
       <NavigatorIOS
-        style={styles.navigator}
+        style={IndexStyles.navigator}
         initialRoute={{
           title: "Home",
           component: Home,
