@@ -18,6 +18,8 @@ $(function(){
     var semesters, events, students, students_dict;
     // Date format (if changes, need to be changed in several places)
     var dateFormat = "YYYY-MM-DD";
+    // Table id to find main events table
+    var eventsTableId = "eventsTableContainter";
 
     // Helper functions to get ID strings
     var getEventId = function (id) {
@@ -27,11 +29,11 @@ $(function(){
     // Logic starts here
 
     // Add delay to display the modal
-    $('#loading').on('show.bs.modal', function (e) {
+    $("#loading").on("show.bs.modal", function (e) {
         setTimeout(function(){
             loadSemesters();
         }, loadingInterval);
-        $('#loading').off('show.bs.modal');
+        $("#loading").off("show.bs.modal");
     });
 
     // Load semesters data from the server
@@ -107,11 +109,11 @@ $(function(){
                         // trigger change to update dates
                         $("#semesterInput").trigger("change");
                         // triger date pickers to include the dates
-                        $('#startDatePicker').data("DateTimePicker").date(
-                            moment($('#startDatePicker').val(), dateFormat)
+                        $("#startDatePicker").data("DateTimePicker").date(
+                            moment($("#startDatePicker").val(), dateFormat)
                         );
-                        $('#endDatePicker').data("DateTimePicker").date(
-                            moment($('#endDatePicker').val(), dateFormat)
+                        $("#endDatePicker").data("DateTimePicker").date(
+                            moment($("#endDatePicker").val(), dateFormat)
                         );
                         loadEvents();
                     } else {
@@ -180,6 +182,8 @@ $(function(){
 
     var loadAllGraphs = function (data) {
 
+        $("#" + eventsTableId).html("");
+
         $("#loading .modal-body").append(getLoadingElement({
             message : "Rendering all the needed graphs&hellip;",
             type : "text-info"
@@ -207,6 +211,11 @@ $(function(){
         }
 
         // TO-DO: here is the check and DOM update for no events/no students
+        if (events.length == 0) {
+            $("#" + eventsTableId).append("<h2>No events to display, please try new search</h2>");
+            doneLoading();
+            return;
+        }
         console.log("Students:")
         console.log(students);
         console.log("Events:")
@@ -227,33 +236,28 @@ $(function(){
     }
 
     var createEventsTable = function () {
-        var tableId = "eventsTableContainter";
         var tableElement = $("<table />", {
-            id: tableId
+            id: eventsTableId
         }).appendTo("#eventsTableContainter");
         tableElement.addClass("table table-hover sortable");
         tableElement.append("\
             <thead> \
                 <th>Name</th> \
                 <th data-defaultsort='desc'>Date</th> \
-                <th>Estimated attendance</th> \
+                <th>Attendees</th> \
             </thead> \
             <tbody> \
             </tbody> \
         ");
 
-        tableElement = $("#" + tableId + " tbody");
+        tableElement = $("#" + eventsTableId + " tbody");
 
         var tableRowElement = _.template("\
-            <tr id='<%= id %>''> \
+            <tr id='<%= id %>' class='clickable-row'> \
                 <td><%= name %></td> \
-                <td><%= date %></td> \
-                <td data-value='<%= participants %>'><%= attendance %></td> \
+                <td data-dateformat='" + dateFormat + "'><%= date %></td> \
+                <td><%= participants %></td> \
             </tr> \
-        ");
-
-        var attendanceText = _.template("\
-            <%= percentage %>% (<%= attended %>/" + students.length + ")\
         ");
 
         _.each(events, function (ev) {
@@ -262,15 +266,19 @@ $(function(){
                 name : ev.fields.name,
                 date : ev.fields.date,
                 participants : ev.fields.participants.length,
-                attendance : attendanceText({
-                    percentage : (ev.fields.participants.length/students.length* 100).toFixed(2),
-                    attended : ev.fields.participants.length
-                })
             }));
+            $("#" + getEventId(ev.pk)).on("click", tableRowModal.bind(this, ev));
         });
 
         $.bootstrapSortable("applyLast");
 
+    }
+
+    var tableRowModal = function(ev) {
+        console.log(ev);
+        $("#statsModal .modal-title").text(ev.fields.name + " (" + ev.fields.date + ")");
+
+        $("#statsModal").modal("show");
     }
 
     var doneLoading = function () {
@@ -284,7 +292,7 @@ $(function(){
         $("#loading .modal-body .glyphicon").removeClass("glyphicon-refresh-animate glyphicon-refresh").addClass("glyphicon-ok");
 
         setTimeout(function(){
-            $('#loading').modal('hide');
+            $("#loading").modal("hide");
         }, loadingInterval);
     }
 
@@ -315,7 +323,7 @@ $(function(){
         }));
 
         setTimeout(function(){
-            $('#loading').modal('hide');
+            $("#loading").modal("hide");
         }, loadingInterval);
     }
 
@@ -336,7 +344,7 @@ $(function(){
     $("#applyDateRange").on("click", function(e) {
         e.preventDefault();
         resetModal();
-        $('#loading').modal('show');
+        $("#loading").modal("show");
 
         setTimeout(function(){
             loadEvents();
@@ -353,19 +361,19 @@ $(function(){
 
 
     // Datepickers setup
-    $('#startDatePicker').datetimepicker({
+    $("#startDatePicker").datetimepicker({
         format: dateFormat
     });
-    $('#endDatePicker').datetimepicker({
+    $("#endDatePicker").datetimepicker({
         format: dateFormat
     });
     $("#startDatePicker").on("dp.change", function (e) {
-        $('#endDatePicker').data("DateTimePicker").minDate(e.date);
+        $("#endDatePicker").data("DateTimePicker").minDate(e.date);
     });
     $("#endDatePicker").on("dp.change", function (e) {
-        $('#startDatePicker').data("DateTimePicker").maxDate(e.date);
+        $("#startDatePicker").data("DateTimePicker").maxDate(e.date);
     });
 
-    $('#loading').modal('show');
+    $("#loading").modal("show");
 
 });

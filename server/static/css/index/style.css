@@ -1,3 +1,6 @@
+/*
+  Modal-related styles
+*/
 .modal {
   text-align: center !important;
 }
@@ -16,6 +19,13 @@
 
 #loading .modal-body .glyphicon {
   font-size: 30px;
+}
+
+/*
+  Clickable rows
+*/
+tr.clickable-row {
+    cursor: pointer;
 }
 
 /*
