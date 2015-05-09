@@ -15,23 +15,56 @@ $(function(){
     // To smoothen loading put intervals (or put to 0 for fastest speed)
     var loadingInterval = 1000;
     // To store dates of semesters globally
-    var semesters, events, students, students_dict;
+    var semesters, events, students, studentsDict, prevFilteredEvents;
     // Date format (if changes, need to be changed in several places)
     var dateFormat = "YYYY-MM-DD";
+    // Table id to find main events table
+    var eventsTableId = "eventsTable";
 
     // Helper functions to get ID strings
     var getEventId = function (id) {
         return "event" + id;
     }
+    var getParticipantId = function (id) {
+        return "participant" + id;
+    }
 
     // Logic starts here
 
     // Add delay to display the modal
-    $('#loading').on('show.bs.modal', function (e) {
+    $("#loading").on("show.bs.modal", function (e) {
         setTimeout(function(){
             loadSemesters();
         }, loadingInterval);
-        $('#loading').off('show.bs.modal');
+        $("#loading").off("show.bs.modal");
+    });
+
+    // Dirty fix for proper graphs styling
+    $("#statsModal").on("shown.bs.modal", function (e) {
+        $(window).resize();
+
+        $("#graphLoading").hide();
+        $("#genderGraphRow div").show();
+        $("#yearGraphRow div").show();
+        $("#generalInfoH").show();
+
+    });
+
+    $("#statsModal").on("hidden.bs.modal", function (e) {
+        var c1 = $("#genderGraphRow div").highcharts();
+        if (c1) {
+            c1.destroy();
+        }
+        var c2 = $("#yearGraphRow div").highcharts();
+        if (c2) {
+            c2.destroy();
+        }
+
+        $("#genderGraphRow div").hide();
+        $("#yearGraphRow div").hide();
+        $("#generalInfoH").hide();
+        $("#graphLoading").show();
+        $("#generalInfo").html("");
     });
 
     // Load semesters data from the server
@@ -107,11 +140,11 @@ $(function(){
                         // trigger change to update dates
                         $("#semesterInput").trigger("change");
                         // triger date pickers to include the dates
-                        $('#startDatePicker').data("DateTimePicker").date(
-                            moment($('#startDatePicker').val(), dateFormat)
+                        $("#startDatePicker").data("DateTimePicker").date(
+                            moment($("#startDatePicker").val(), dateFormat)
                         );
-                        $('#endDatePicker').data("DateTimePicker").date(
-                            moment($('#endDatePicker').val(), dateFormat)
+                        $("#endDatePicker").data("DateTimePicker").date(
+                            moment($("#endDatePicker").val(), dateFormat)
                         );
                         loadEvents();
                     } else {
@@ -180,6 +213,8 @@ $(function(){
 
     var loadAllGraphs = function (data) {
 
+        $("#" + eventsTableId).html("");
+
         $("#loading .modal-body").append(getLoadingElement({
             message : "Rendering all the needed graphs&hellip;",
             type : "text-info"
@@ -207,53 +242,70 @@ $(function(){
         }
 
         // TO-DO: here is the check and DOM update for no events/no students
-        console.log("Students:")
-        console.log(students);
-        console.log("Events:")
-        console.log(events);
+        if (events.length == 0) {
+            $("#" + eventsTableId).append("<h2>No events to display, please try new search</h2>");
+            $(".hide-no-events").hide();
+            doneLoading();
+            return;
+        }
+        $(".hide-no-events").show();
+
 
         // converts students to students dictionary for easy look up by n_number
-        var students_dict = _.object(_.map(students, function(item) {
+        studentsDict = _.object(_.map(students, function(item) {
            return [item.pk, item.fields]
         }));
 
-        console.log("Students dictionary:")
-        console.log(students_dict);
 
         createEventsTable();
+
+        createGlobalGraphs();
 
         doneLoading();
 
     }
 
+    var createGlobalGraphs = function() {
+        var c1 = $("#genderGraph div").highcharts();
+        if (c1) {
+            c1.destroy();
+        }
+        var c2 = $("#yearGraph div").highcharts();
+        if (c2) {
+            c2.destroy();
+        }
+        $("#participantsGlobal").html("");
+
+        getGenderChartAt("#genderGraph div", events);
+
+        getYearChartAt("#yearGraph div", events);
+
+        getGeneralInfoAt("#participantsGlobal", events);
+    }
+
     var createEventsTable = function () {
-        var tableId = "eventsTableContainter";
         var tableElement = $("<table />", {
-            id: tableId
+            id: eventsTableId
         }).appendTo("#eventsTableContainter");
-        tableElement.addClass("table table-hover sortable");
+        tableElement.addClass("table table-hover sortable hide-no-events");
         tableElement.append("\
             <thead> \
                 <th>Name</th> \
                 <th data-defaultsort='desc'>Date</th> \
-                <th>Estimated attendance</th> \
+                <th>Attendees</th> \
             </thead> \
             <tbody> \
             </tbody> \
         ");
 
-        tableElement = $("#" + tableId + " tbody");
+        tableElement = $("#" + eventsTableId + " tbody");
 
         var tableRowElement = _.template("\
-            <tr id='<%= id %>''> \
+            <tr id='<%= id %>' class='clickable-row'> \
                 <td><%= name %></td> \
-                <td><%= date %></td> \
-                <td data-value='<%= participants %>'><%= attendance %></td> \
+                <td data-dateformat='" + dateFormat + "'><%= date %></td> \
+                <td><%= participants %></td> \
             </tr> \
-        ");
-
-        var attendanceText = _.template("\
-            <%= percentage %>% (<%= attended %>/" + students.length + ")\
         ");
 
         _.each(events, function (ev) {
@@ -262,15 +314,301 @@ $(function(){
                 name : ev.fields.name,
                 date : ev.fields.date,
                 participants : ev.fields.participants.length,
-                attendance : attendanceText({
-                    percentage : (ev.fields.participants.length/students.length* 100).toFixed(2),
-                    attended : ev.fields.participants.length
-                })
             }));
+            $("#" + getEventId(ev.pk)).on("click", tableRowModal.bind(this, ev));
         });
 
         $.bootstrapSortable("applyLast");
 
+    }
+
+    var updateFilter = function (filterString) {
+        if (filterString.length == 0) {
+            applyFilter(events)
+        } else {
+            var filteredEvents = events;
+            _.each(filterString.trim().split(' '), function (filterStr) {
+                if (filterStr[0] == "-") {
+                    filteredEvents = _.filter(filteredEvents, function (ev) {
+                        return ev.fields.name.toLowerCase().indexOf(filterStr.substring(1).toLowerCase()) == -1;
+                    })
+                } else {
+                    filteredEvents = _.filter(filteredEvents, function (ev) {
+                        return ev.fields.name.toLowerCase().indexOf(filterStr.toLowerCase()) != -1;
+                    })
+                }
+            })
+            applyFilter(filteredEvents);
+        }
+    }
+
+    var applyFilter = function (filteredEvents) {
+        if (filteredEvents.length == 0) {
+            $("#" + eventsTableId).after("<h2>No events to display, please try new search</h2>");
+            $(".hide-no-events").hide();
+        } else {
+            $("#eventsTableContainter h2").remove();
+            $(".hide-no-events").show();
+        }
+        getGeneralInfoAt("#participantsGlobal", filteredEvents);
+        $("#eventsTableContainter tbody tr").hide()
+        _.each(filteredEvents, function (ev) {
+            $("#" + getEventId(ev.pk)).show();
+        });
+        var c1 = $("#genderGraph div").highcharts();
+        if (c1) {
+            c1.destroy();
+        }
+        var c2 = $("#yearGraph div").highcharts();
+        if (c2) {
+            c2.destroy();
+        }
+
+        getGenderChartAt("#genderGraph div", filteredEvents);
+
+        getYearChartAt("#yearGraph div", filteredEvents);
+    }
+
+    var tableRowModal = function (ev) {
+        $("#statsModal .modal-title").text(ev.fields.name + " (" + ev.fields.date + ")");
+
+        $("#statsModal").modal("show");
+
+        setTimeout(function(){
+            getGenderChartAt("#genderGraphRow div", ev);
+
+            getYearChartAt("#yearGraphRow div", ev);
+
+            getGeneralInfoAt("#generalInfo", ev);
+
+        }, loadingInterval);
+
+    }
+
+    var getGeneralInfoAt = function (id, ev) {
+        $(id).html("");
+        var eventParticipants = getEventParticipants(ev);
+        var isMultipleEvent = _.isArray(ev);
+
+        var tableId = "studentsTableContainer" + id.substring(1);
+
+        $(id + "H h4 span").html(" ("+ eventParticipants.length + " " + (eventParticipants.length == 1 ? "person" : "people") + ")")
+
+        var tableElement = $("<table />", {
+            id: tableId
+        }).appendTo(id);
+        tableElement.addClass("table table-hover sortable");
+        tableElement.append("\
+            <thead> \
+                <th data-defaultsort='asc'>Name</th> \
+                <th>Gender</th> \
+                <th>Year</th> \
+            </thead> \
+            <tbody> \
+            </tbody> \
+        ");
+
+        if (isMultipleEvent) {
+            $("#" + tableId + " thead tr").append("<th>Attended</th>");
+        }
+
+        tableElement = $("#" + tableId + " tbody");
+
+        var tableRowElement = _.template("\
+            <tr id='<%= id %>' class='clickable-row'> \
+                <td><%= name %></td> \
+                <td><%= gender %></td> \
+                <td><%= year %></td> \
+            </tr> \
+        ");
+
+        var participatedElement = _.template("\
+            <td><%= participated %></td> \
+        ");
+
+        _.each(eventParticipants, function (participant) {
+            var student = studentsDict[participant];
+            tableElement.append(tableRowElement({
+                id : getParticipantId(participant),
+                name : student.last_name + " " + student.first_name,
+                gender : student.gender,
+                year : student.year,
+            }));
+            if (isMultipleEvent) {
+                $("#" + getParticipantId(participant)).append(participatedElement({
+
+                    participated : _.chain(events)
+                        .filter(function(ev) {
+                            return _.indexOf(ev.fields.participants, participant) != -1
+                        })
+                        .value()
+                        .length
+
+                }));
+            }
+
+            // $("#" + getEventId(ev.pk)).on("click", tableRowModal.bind(this, ev));
+        });
+
+        $.bootstrapSortable("applyLast");
+    }
+
+    var getGenderChartAt = function (id, ev) {
+
+        var seriesDrilldown = getGenderData(ev);
+
+        $(id).highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Breakdown by gender'
+            },
+            subtitle: {
+                text: 'Click the slices to view breakdown of each gender by year'
+            },
+            series: [{
+                name: 'Genders',
+                colorByPoint: true,
+                data: seriesDrilldown[0]
+            }],
+            drilldown: {
+                series: seriesDrilldown[1]
+            },
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
+            },
+        });
+    };
+
+    var getYearChartAt = function (id, ev) {
+
+        var seriesDrilldown = getYearData(ev);
+
+        $(id).highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Breakdown by year'
+            },
+            subtitle: {
+                text: 'Click the slices to view breakdown of each year by gender'
+            },
+            series: [{
+                name: 'Years',
+                colorByPoint: true,
+                data: seriesDrilldown[0]
+            }],
+            drilldown: {
+                series: seriesDrilldown[1]
+            },
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
+            },
+        });
+    };
+
+    var getGenderData = function (ev) {
+        var series = _.map(getGenderBreakdown(ev), function(num, key) {
+            return {
+                name : key,
+                y: num,
+                drilldown : key
+            }
+        });
+
+
+        var drilldown = _.map(series, function (num) {
+            return {
+                id : num.drilldown,
+                data : _.pairs(getYearBreakdown(ev, num.name))
+            }
+        });
+
+        return [series, drilldown];
+    };
+
+    var getYearData = function (ev) {
+        var series = _.map(getYearBreakdown(ev), function(num, key) {
+            return {
+                name : key,
+                y: num,
+                drilldown : key
+            }
+        });
+
+        var drilldown = _.map(series, function (num) {
+            return {
+                id : num.drilldown,
+                data : _.pairs(getGenderBreakdown(ev, num.name))
+            }
+        });
+
+        return [series, drilldown];
+    };
+
+    var getGenderBreakdown = function (ev, constraint) {
+        var eventParticipants = getEventParticipants(ev);
+
+        // filter ones that we don't need
+        if (constraint) {
+            eventParticipants = _.filter(eventParticipants, function (participant) {
+                if (studentsDict[participant].year == null && constraint == "null") {
+                    return true;
+                }
+                return studentsDict[participant].year == constraint;
+            })
+        }
+
+        // count them
+        var result = _.countBy(eventParticipants, function(participant) {
+            return studentsDict[participant].gender;
+        });
+
+        return result;
+
+    }
+
+    var getYearBreakdown = function (ev, constraint) {
+        var eventParticipants = getEventParticipants(ev);
+
+        // filter ones that we don't need
+        if (constraint) {
+            eventParticipants = _.filter(eventParticipants, function (participant) {
+                if (studentsDict[participant].gender == null && constraint == "null") {
+                    return true;
+                }
+                return studentsDict[participant].gender == constraint;
+            })
+        }
+
+        // count them
+        var result = _.countBy(eventParticipants, function(participant) {
+            return studentsDict[participant].year;
+        });
+
+        return result;
+
+    }
+
+    var getEventParticipants = function (ev) {
+        var eventParticipants;
+
+        // Get all unique participants
+        if (_.isArray(ev)) {
+            eventParticipants = _.chain(ev)
+                .map(function (n) { return n.fields.participants; })
+                .flatten()
+                .uniq()
+                .value();
+        } else {
+            eventParticipants = ev.fields.participants;
+        }
+
+        return eventParticipants;
     }
 
     var doneLoading = function () {
@@ -284,7 +622,7 @@ $(function(){
         $("#loading .modal-body .glyphicon").removeClass("glyphicon-refresh-animate glyphicon-refresh").addClass("glyphicon-ok");
 
         setTimeout(function(){
-            $('#loading').modal('hide');
+            $("#loading").modal("hide");
         }, loadingInterval);
     }
 
@@ -315,7 +653,7 @@ $(function(){
         }));
 
         setTimeout(function(){
-            $('#loading').modal('hide');
+            $("#loading").modal("hide");
         }, loadingInterval);
     }
 
@@ -336,7 +674,7 @@ $(function(){
     $("#applyDateRange").on("click", function(e) {
         e.preventDefault();
         resetModal();
-        $('#loading').modal('show');
+        $("#loading").modal("show");
 
         setTimeout(function(){
             loadEvents();
@@ -353,19 +691,38 @@ $(function(){
 
 
     // Datepickers setup
-    $('#startDatePicker').datetimepicker({
+    $("#startDatePicker").datetimepicker({
         format: dateFormat
     });
-    $('#endDatePicker').datetimepicker({
+    $("#endDatePicker").datetimepicker({
         format: dateFormat
     });
     $("#startDatePicker").on("dp.change", function (e) {
-        $('#endDatePicker').data("DateTimePicker").minDate(e.date);
+        $("#endDatePicker").data("DateTimePicker").minDate(e.date);
     });
     $("#endDatePicker").on("dp.change", function (e) {
-        $('#startDatePicker').data("DateTimePicker").maxDate(e.date);
+        $("#startDatePicker").data("DateTimePicker").maxDate(e.date);
     });
 
-    $('#loading').modal('show');
+    // Handle filtering
+    $("#filterInput").on("keypress", function (e) {
+        if (e.which == 13 ) {
+            e.preventDefault();
+            updateFilter($("#filterInput").val());
+        }
+    });
+
+    $("#applyFilter").on("click", function (e) {
+        e.preventDefault();
+        updateFilter($("#filterInput").val());
+    });
+
+    $("#removeFilter").on("click", function (e) {
+        e.preventDefault();
+        $("#filterInput").val("");
+        updateFilter("");
+    })
+
+    $("#loading").modal("show");
 
 });

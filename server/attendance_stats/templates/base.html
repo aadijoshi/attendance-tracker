@@ -8,10 +8,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         {% load staticfiles %}
+
+        <!-- Normalize css resets all the weird css inconsistancies -->
         <link rel="stylesheet" href="{% static 'bower_components/html5-boilerplate/dist/css/normalize.css' %}">
+
+        <!-- Boilerplate css with some shortcut classes -->
         <link rel="stylesheet" href="{% static 'bower_components/html5-boilerplate/dist/css/main.css' %}">
+
+        <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap-theme.min.css' %}">
+
+        <!-- Our main CSS file for random useful classes -->
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -24,8 +35,14 @@
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="{% static 'bower_components/html5-boilerplate/js/vendor/jquery-1.10.2.min.js' %}"><\/script>')</script>
+
+        <!-- Boilerplate plugins -->
         <script src="{% static 'bower_components/html5-boilerplate/dist/js/plugins.js' %}"></script>
+
+        <!-- Bootstrap js files -->
         <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+        <!-- Underscore for all the useful handy utility functions -->
         <script src="{% static 'bower_components/underscore/underscore-min.js' %}"></script>
         {% block scripts %}{% endblock %}
     </body>

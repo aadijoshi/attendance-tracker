@@ -1,5 +1,8 @@
+/*
+  Modal-related styles
+*/
 .modal {
-  text-align: center !important;
+  text-align: center;
 }
 
 .modal:before {
@@ -16,6 +19,36 @@
 
 #loading .modal-body .glyphicon {
   font-size: 30px;
+}
+
+#statsModal .modal-body .glyphicon {
+  font-size: 30px;
+}
+
+#statsModal .modal-dialog {
+  width: 95%;
+  margin: 10 auto;
+}
+
+/*
+  Resetting modal's text align
+*/
+#generalInfo {
+  text-align: left;
+}
+
+/*
+  Larger input
+*/
+#filterInput {
+  width: 450px;
+}
+
+/*
+  Clickable rows
+*/
+tr.clickable-row {
+    cursor: pointer;
 }
 
 /*

@@ -15,6 +15,8 @@ Index | Attendance Tracker
 
 <!-- Highcharts for statistics rendering -->
 <script type="text/javascript" src="{% static 'bower_components/highcharts/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/highcharts/modules/data.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/highcharts/modules/drilldown.js' %}"></script>
 
 <!-- Bootstrap-sortable for table sorting -->
 <script type="text/javascript" src="{% static 'bower_components/bootstrap-sortable/Scripts/bootstrap-sortable.js' %}"></script>
@@ -36,30 +38,82 @@ Index | Attendance Tracker
 
 <div class="row">
     <div class="col-md-12">
-        <h3>Analyze events</h3>
+        <h3>Analyze events<br /><small>Load events for a date range. Updating this will reload the page</small></h3>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-12">
         <form class="form-inline">
-        <div class="form-group">
-            <label for="semesterInput">Semester</label>
-            <select class="form-control" id="semesterInput">
-            </select>
-        </div>
-            <label for="startDatePicker">or from:</label>
-        <!-- Semidirty fix for the datepicker left inherit problem (see css) -->
-        <div class="form-group">
-            <input type="text" class="form-control" id="startDatePicker" placeholder="Pick Date">
-        </div>
-        <label for="endDatePicker">to:</label>
-        <div class="form-group">
-            <input type="text" class="form-control" id="endDatePicker" placeholder="Pick Date">
-        </div>
+            <div class="form-group">
+                <label for="semesterInput">Semester</label>
+                <select class="form-control" id="semesterInput">
+                </select>
+            </div>
+                <label for="startDatePicker">or from:</label>
+            <!-- Semidirty fix for the datepicker left inherit problem (see css) -->
+            <div class="form-group">
+                <input type="text" class="form-control" id="startDatePicker" placeholder="Pick Date">
+            </div>
+            <label for="endDatePicker">to:</label>
+            <div class="form-group">
+                <input type="text" class="form-control" id="endDatePicker" placeholder="Pick Date">
+            </div>
             <button class="btn btn-default" id="applyDateRange"><span class="glyphicon glyphicon-refresh">&nbsp;Apply</button>
-          </div>
         </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Filter events<br /><small>Filter events by name. Updating this will <b>NOT</b> reload the page</small></h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form class="form-inline">
+            <div class="form-group">
+                <input type="text" class="form-control" id="filterInput" placeholder="Start typing events' names">
+                <button class="btn btn-default" id="applyFilter"><span class="glyphicon glyphicon-ok">&nbsp;Apply</button>
+                <button class="btn btn-default" id="removeFilter"><span class="glyphicon glyphicon-remove">&nbsp;Clear</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row top-mrg-30 hide-no-events">
+    <div class="col-md-12">
+        <h3>Graphs<br /><small>Analytics graphs for events that match filtering</small></h3>
+    </div>
+</div>
+
+<div class="row hide-no-events">
+    <div class="col-md-12" id="globalEventsGraphs">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="genderGraph" class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+                <div id="yearGraph" class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" id="participantsGlobalH">
+                <h4>Participants<span></span></h4>
+                <div id="participantsGlobal">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row hide-no-events">
+    <div class="col-md-12">
+        <h3>Events<br /><small>List of events that match filtering</small></h3>
     </div>
 </div>
 
@@ -68,6 +122,42 @@ Index | Attendance Tracker
     <div class="col-md-12" id="eventsTableContainter">
     </div>
 </div>
+
+
+<!-- Stats Modal -->
+<div id="statsModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="graphLoading">
+                    <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+                    <h4>Loading, please wait&hellip;</h4>
+                </div>
+                <div class="row" id="infoRow">
+                    <div class="col-md-6">
+                        <div id="genderGraphRow" class="row">
+                            <div class="col-md-12">
+                            </div>
+                        </div>
+                        <div id="yearGraphRow" class="row">
+                            <div class="col-md-12">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="generalInfoH">
+                        <h4>Participants<span></span></h4>
+                        <div id="generalInfo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 <!-- Loading Modal -->
