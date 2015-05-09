@@ -15,7 +15,7 @@ $(function(){
     // To smoothen loading put intervals (or put to 0 for fastest speed)
     var loadingInterval = 1000;
     // To store dates of semesters globally
-    var semesters, events, students, studentsDict;
+    var semesters, events, students, studentsDict, prevFilteredEvents;
     // Date format (if changes, need to be changed in several places)
     var dateFormat = "YYYY-MM-DD";
     // Table id to find main events table
@@ -272,11 +272,11 @@ $(function(){
     }
 
     var createGlobalGraphs = function() {
-        var c1 = $("#genderGraphRow div").highcharts();
+        var c1 = $("#genderGraph div").highcharts();
         if (c1) {
             c1.destroy();
         }
-        var c2 = $("#yearGraphRow div").highcharts();
+        var c2 = $("#yearGraph div").highcharts();
         if (c2) {
             c2.destroy();
         }
@@ -328,7 +328,47 @@ $(function(){
 
     }
 
-    var tableRowModal = function(ev) {
+    var updateFilter = function (filterString) {
+        if (filterString.length == 0) {
+            applyFilter(events)
+        } else {
+            var filteredEvents = events;
+            _.each(filterString.trim().split(' '), function (filterStr) {
+                if (filterStr[0] == "-") {
+                    filteredEvents = _.filter(filteredEvents, function (ev) {
+                        return ev.fields.name.toLowerCase().indexOf(filterStr.substring(1).toLowerCase()) == -1;
+                    })
+                } else {
+                    filteredEvents = _.filter(filteredEvents, function (ev) {
+                        return ev.fields.name.toLowerCase().indexOf(filterStr.toLowerCase()) != -1;
+                    })
+                }
+            })
+            applyFilter(filteredEvents);
+        }
+    }
+
+    var applyFilter = function (filteredEvents) {
+        getGeneralInfoAt("#participantsGlobal", filteredEvents);
+        $("#eventsTableContainter tbody tr").hide()
+        _.each(filteredEvents, function (ev) {
+            $("#" + getEventId(ev.pk)).show();
+        });
+        var c1 = $("#genderGraph div").highcharts();
+        if (c1) {
+            c1.destroy();
+        }
+        var c2 = $("#yearGraph div").highcharts();
+        if (c2) {
+            c2.destroy();
+        }
+
+        getGenderChartAt("#genderGraph div", filteredEvents);
+
+        getYearChartAt("#yearGraph div", filteredEvents);
+    }
+
+    var tableRowModal = function (ev) {
         $("#statsModal .modal-title").text(ev.fields.name + " (" + ev.fields.date + ")");
 
         $("#statsModal").modal("show");
@@ -345,6 +385,7 @@ $(function(){
     }
 
     var getGeneralInfoAt = function (id, ev) {
+        $(id).html("");
         var eventParticipants = getEventParticipants(ev);
         var isMultipleEvent = _.isArray(ev);
 
@@ -413,24 +454,7 @@ $(function(){
 
     var getGenderChartAt = function (id, ev) {
 
-        var series = _.map(getGenderBreakdown(ev), function(num, key) {
-            return {
-                name : key,
-                y: num,
-                drilldown : key
-            }
-        });
-
-        console.log(series);
-
-        var drilldown = _.map(series, function (num) {
-            return {
-                id : num.drilldown,
-                data : _.pairs(getYearBreakdown(ev, num.name))
-            }
-        });
-
-        console.log(drilldown);
+        var seriesDrilldown = getGenderData(ev);
 
         $(id).highcharts({
             chart: {
@@ -445,10 +469,10 @@ $(function(){
             series: [{
                 name: 'Genders',
                 colorByPoint: true,
-                data: series
+                data: seriesDrilldown[0]
             }],
             drilldown: {
-                series: drilldown
+                series: seriesDrilldown[1]
             },
             tooltip: {
                 headerFormat: '',
@@ -459,6 +483,54 @@ $(function(){
 
     var getYearChartAt = function (id, ev) {
 
+        var seriesDrilldown = getYearData(ev);
+
+        $(id).highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Breakdown by year'
+            },
+            subtitle: {
+                text: 'Click the slices to view breakdown of each year by gender'
+            },
+            series: [{
+                name: 'Years',
+                colorByPoint: true,
+                data: seriesDrilldown[0]
+            }],
+            drilldown: {
+                series: seriesDrilldown[1]
+            },
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
+            },
+        });
+    };
+
+    var getGenderData = function (ev) {
+        var series = _.map(getGenderBreakdown(ev), function(num, key) {
+            return {
+                name : key,
+                y: num,
+                drilldown : key
+            }
+        });
+
+
+        var drilldown = _.map(series, function (num) {
+            return {
+                id : num.drilldown,
+                data : _.pairs(getYearBreakdown(ev, num.name))
+            }
+        });
+
+        return [series, drilldown];
+    };
+
+    var getYearData = function (ev) {
         var series = _.map(getYearBreakdown(ev), function(num, key) {
             return {
                 name : key,
@@ -474,29 +546,7 @@ $(function(){
             }
         });
 
-        $(id).highcharts({
-            chart: {
-                type: 'pie'
-            },
-            title: {
-                text: 'Breakdown by year'
-            },
-            subtitle: {
-                text: 'Click the slices to view breakdown of each year by gender'
-            },
-            series: [{
-                name: 'Years',
-                colorByPoint: true,
-                data: series
-            }],
-            drilldown: {
-                series: drilldown
-            },
-            tooltip: {
-                headerFormat: '',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
-            },
-        });
+        return [series, drilldown];
     };
 
     var getGenderBreakdown = function (ev, constraint) {
@@ -652,6 +702,25 @@ $(function(){
     $("#endDatePicker").on("dp.change", function (e) {
         $("#startDatePicker").data("DateTimePicker").maxDate(e.date);
     });
+
+    // Handle filtering
+    $("#filterInput").on("keypress", function (e) {
+        if (e.which == 13 ) {
+            e.preventDefault();
+            updateFilter($("#filterInput").val());
+        }
+    });
+
+    $("#applyFilter").on("click", function (e) {
+        e.preventDefault();
+        updateFilter($("#filterInput").val());
+    });
+
+    $("#removeFilter").on("click", function (e) {
+        e.preventDefault();
+        $("#filterInput").val("");
+        updateFilter("");
+    })
 
     $("#loading").modal("show");
 
