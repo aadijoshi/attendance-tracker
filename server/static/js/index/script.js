@@ -243,7 +243,8 @@ $(function(){
 
         // TO-DO: here is the check and DOM update for no events/no students
         if (events.length == 0) {
-            $("#" + eventsTableId).append("<h2>No events to display, please try new search</h2>");
+            $("#eventsTableContainter h2").remove();
+            $("#" + eventsTableId).after("<h2>No events to display, please try new search</h2>");
             $(".hide-no-events").hide();
             doneLoading();
             return;
@@ -343,12 +344,11 @@ $(function(){
     }
 
     var applyFilter = function (filteredEvents) {
+        $("#eventsTableContainter h2").remove();
+        $(".hide-no-events").show();
         if (filteredEvents.length == 0) {
             $("#" + eventsTableId).after("<h2>No events to display, please try new search</h2>");
             $(".hide-no-events").hide();
-        } else {
-            $("#eventsTableContainter h2").remove();
-            $(".hide-no-events").show();
         }
         getGeneralInfoAt("#participantsGlobal", filteredEvents);
         $("#eventsTableContainter tbody tr").hide()
