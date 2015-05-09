@@ -15,7 +15,7 @@ $(function(){
     // To smoothen loading put intervals (or put to 0 for fastest speed)
     var loadingInterval = 1000;
     // To store dates of semesters globally
-    var semesters, events, students, students_dict;
+    var semesters, events, students, studentsDict;
     // Date format (if changes, need to be changed in several places)
     var dateFormat = "YYYY-MM-DD";
     // Table id to find main events table
@@ -34,6 +34,29 @@ $(function(){
             loadSemesters();
         }, loadingInterval);
         $("#loading").off("show.bs.modal");
+    });
+
+    // Dirty fix for proper graphs styling
+    $("#statsModal").on("shown.bs.modal", function (e) {
+        console.log('resize');
+        $(window).resize();
+
+        $("#graphLoading").hide();
+        $("#genderGraphRow div").show();
+        $("#yearGraphRow div").show();
+        $("#generalInfoH").show();
+
+    });
+
+    $("#statsModal").on("hidden.bs.modal", function (e) {
+        var c1 = $("#genderGraphRow div").highcharts();
+        if (c1) {
+            c1.destroy();
+        }
+        var c2 = $("#yearGraphRow div").highcharts();
+        if (c2) {
+            c2.destroy();
+        }
     });
 
     // Load semesters data from the server
@@ -222,12 +245,12 @@ $(function(){
         console.log(events);
 
         // converts students to students dictionary for easy look up by n_number
-        var students_dict = _.object(_.map(students, function(item) {
+        studentsDict = _.object(_.map(students, function(item) {
            return [item.pk, item.fields]
         }));
 
         console.log("Students dictionary:")
-        console.log(students_dict);
+        console.log(studentsDict);
 
         createEventsTable();
 
@@ -275,10 +298,168 @@ $(function(){
     }
 
     var tableRowModal = function(ev) {
-        console.log(ev);
         $("#statsModal .modal-title").text(ev.fields.name + " (" + ev.fields.date + ")");
 
+        $("#genderGraphRow div").hide();
+        $("#yearGraphRow div").hide();
+        $("#generalInfoH").hide();
+        $("#graphLoading").show();
+
         $("#statsModal").modal("show");
+
+        setTimeout(function(){
+            getGenderChartAt("#genderGraphRow div", ev);
+
+            getYearChartAt("#yearGraphRow div", ev);
+        }, loadingInterval);
+
+        // getGenderChartAt("#genderGraphRow div", ev);
+
+        // getYearChartAt("#yearGraphRow div", ev);
+
+        // $("#statsModal").modal("show");
+
+    }
+
+    var getGenderChartAt = function (id, ev) {
+
+        var series = _.map(getGenderBreakdown(ev), function(num, key) {
+            return {
+                name : key,
+                y: num,
+                drilldown : key
+            }
+        });
+
+        var drilldown = _.map(series, function (num) {
+            return {
+                id : num.drilldown,
+                data : _.pairs(getYearBreakdown(ev, num.name))
+            }
+        });
+
+        var s = $(id).highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Breakdown by gender'
+            },
+            subtitle: {
+                text: 'Click the slices to view breakdown of each gender by year'
+            },
+            series: [{
+                name: 'Genders',
+                colorByPoint: true,
+                data: series
+            }],
+            drilldown: {
+                series: drilldown
+            },
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
+            },
+        });
+
+        console.log(s);
+    };
+
+    var getYearChartAt = function (id, ev) {
+
+        var series = _.map(getYearBreakdown(ev), function(num, key) {
+            return {
+                name : key,
+                y: num,
+                drilldown : key
+            }
+        });
+
+        var drilldown = _.map(series, function (num) {
+            return {
+                id : num.drilldown,
+                data : _.pairs(getGenderBreakdown(ev, num.name))
+            }
+        });
+
+        $(id).highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Breakdown by year'
+            },
+            subtitle: {
+                text: 'Click the slices to view breakdown of each year by gender'
+            },
+            series: [{
+                name: 'Years',
+                colorByPoint: true,
+                data: series
+            }],
+            drilldown: {
+                series: drilldown
+            },
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
+            },
+        });
+    };
+
+    var getGenderBreakdown = function (ev, constraint) {
+        var eventParticipants = getEventParticipants(ev);
+
+        // filter ones that we don't need
+        if (constraint) {
+            eventParticipants = _.filter(eventParticipants, function (participant) {
+                return studentsDict[participant].year == constraint;
+            })
+        }
+
+        // count them
+        var result = _.countBy(eventParticipants, function(participant) {
+            return studentsDict[participant].gender;
+        });
+
+        return result;
+
+    }
+
+    var getYearBreakdown = function (ev, constraint) {
+        var eventParticipants = getEventParticipants(ev);
+
+        // filter ones that we don't need
+        if (constraint) {
+            eventParticipants = _.filter(eventParticipants, function (participant) {
+                return studentsDict[participant].gender == constraint;
+            })
+        }
+
+        // count them
+        var result = _.countBy(eventParticipants, function(participant) {
+            return studentsDict[participant].year;
+        });
+
+        return result;
+
+    }
+
+    var getEventParticipants = function (ev) {
+        var eventParticipants;
+
+        // Get all unique participants
+        if (_.isArray(ev)) {
+            eventParticipants = _.chain(ev)
+                .map(function (n) { return n.fields.participants; })
+                .flatten()
+                .uniq()
+                .value();
+        } else {
+            eventParticipants = ev.fields.participants;
+        }
+
+        return eventParticipants;
     }
 
     var doneLoading = function () {

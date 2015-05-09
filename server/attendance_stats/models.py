@@ -7,10 +7,10 @@ class Student(models.Model):
     net_id = models.CharField("Net ID", max_length=16, null=True, blank=True)
 
     GENDER = (
-        ('F', 'Female'),
-        ('M', 'Male'),
+        ('Female', 'Female'),
+        ('Male', 'Male'),
     )
-    gender = models.CharField(max_length=1,
+    gender = models.CharField(max_length=6,
                                 choices=GENDER, null=True, blank=True)
     year = models.PositiveSmallIntegerField(null=True, blank=True)
 

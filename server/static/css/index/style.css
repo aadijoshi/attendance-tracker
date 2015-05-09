@@ -21,6 +21,41 @@
   font-size: 30px;
 }
 
+#statsModal .modal-body .glyphicon {
+  font-size: 30px;
+}
+
+#statsModal .modal-dialog {
+  width: 95%;
+  margin: 10 auto;
+}
+
+/*
+#statsModal .modal-content {
+  height: inherit;
+}
+
+#statsModal .modal-body {
+  height: inherit;
+}
+
+#infoRow > div {
+  height: 100%;
+}
+
+#genderGraphRow {
+  height: 50% !important;
+}
+
+#yearGraphRow{
+  height: 50% !important;
+}
+
+#infoRow {
+  height: 100% !important;
+}
+*/
+
 /*
   Clickable rows
 */

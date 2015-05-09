@@ -15,6 +15,8 @@ Index | Attendance Tracker
 
 <!-- Highcharts for statistics rendering -->
 <script type="text/javascript" src="{% static 'bower_components/highcharts/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/highcharts/modules/data.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/highcharts/modules/drilldown.js' %}"></script>
 
 <!-- Bootstrap-sortable for table sorting -->
 <script type="text/javascript" src="{% static 'bower_components/bootstrap-sortable/Scripts/bootstrap-sortable.js' %}"></script>
@@ -78,18 +80,25 @@ Index | Attendance Tracker
                 <h4 class="modal-title"></h4>
             </div>
             <div class="modal-body">
-                <div class="row">
+                <div id="graphLoading">
+                    <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+                    <h4>Loading, please wait&hellip;</h4>
+                </div>
+                <div class="row" id="infoRow">
                     <div class="col-md-6">
-                        <div class="row">
+                        <div id="genderGraphRow" class="row">
                             <div class="col-md-12">
                             </div>
                         </div>
-                        <div class="row">
+                        <div id="yearGraphRow" class="row">
                             <div class="col-md-12">
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="generalInfoH">
+                        <h4>General Info</h4>
+                        <div id="generalInfo">
+                        </div>
                     </div>
                 </div>
             </div>
