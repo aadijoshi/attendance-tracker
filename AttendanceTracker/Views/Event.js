@@ -16,9 +16,9 @@ var {
   DatePickerIOS,
   AlertIOS,
   DeviceEventEmitter,
+  ActivityIndicatorIOS,
+  Image,
 } = React;
-
-NNumbers = [818799090, 813549627, 811111111, 822222222, 833333333];
 
 var Event = React.createClass({
   getInitialState: function() {
@@ -34,17 +34,23 @@ var Event = React.createClass({
       editingDate: false,
       editingName: false,
       deviceConnected: false,
+      deviceOpened: false,
     }
   },
   componentWillMount: function() {
-    this.subscriptions = DeviceEventEmitter.addListener('Log', (msg) => {
-      console.log(msg);
-    });
+    this.subscriptions = [
+      DeviceEventEmitter.addListener('Log', (res) => {console.log(res);}),
+      DeviceEventEmitter.addListener('updateConnStatus', this.updateConnStatus),
+      DeviceEventEmitter.addListener('openDevice', this.openDevice),
+      DeviceEventEmitter.addListener('trackDataReady', this.readTrackData),
+    ];
     CardReaderManager.initMagTek();
   },
   componentWillUnmount: function () {
     CardReaderManager.closeDevice();
-    this.subscriptions.remove();
+    for (var i = 0; i < this.subscriptions.length; i++) {
+      this.subscriptions[i].remove();
+    }
   },
   store: function(newSwiped) {
     var storing = {
@@ -62,9 +68,6 @@ var Event = React.createClass({
       })
       .catch((err) => {console.log(err);})
       .done();
-  },
-  onSwipe: function() {
-    this.store(this.state.swiped.concat([NNumbers[Math.floor(Math.random() * NNumbers.length)]]));
   },
   goHome: function() {
     if (this.props.editing) {
@@ -86,9 +89,15 @@ var Event = React.createClass({
   },
   renderName: function(id) {
     return (
-      <TouchableHighlight onPress={this.deleteID.bind(this, id)}>
-          <Text>{id}</Text>
-      </TouchableHighlight>
+      <View style={styles.swipedRow}>
+        <Text style={styles.inputText}>{"N"+id.substring(1)}</Text>
+        <TouchableHighlight onPress={this.deleteID.bind(this, id)}>
+            <Image 
+              source={require('image!clear_button')}
+              style={styles.clearButton}
+            />
+        </TouchableHighlight>
+      </View>
     );
   },
   alertDisconnect: function() {
@@ -100,6 +109,33 @@ var Event = React.createClass({
         {text: "Cancel"},
       ]
     );
+  },
+  openDevice: function(isOpened) {
+    if (isOpened) {
+      AlertIOS.alert(
+        "Alert",
+        "You may now connect the magnetic card reader.",
+        [
+          {text: "OK", onPress: this.setState({deviceOpened: true})},
+        ]
+      );
+    }
+  },
+  readTrackData: function(res) {
+    if (res.status == "TRANS_STATUS_OK" && res.data != "" && res.data[1] != "E") {
+      this.store(this.state.swiped.concat([res.data.split("=")[0].substring(1)]));
+    }
+  },
+  updateConnStatus: function(status) {
+    if (status.isDeviceConnected && status.isDeviceOpened && !this.state.deviceConnected) {
+      this.setState({
+        deviceConnected: true,
+      });
+      AlertIOS.alert(
+        "Alert",
+        "You may now start swiping cards."
+      );
+    }
   },
   render: function() {
     var datePicker, dateButton, swipeButton;
@@ -131,20 +167,31 @@ var Event = React.createClass({
           <Text style={[styles.text, styles.grayedText]}>Done</Text>
         </TouchableHighlight>
       );
-      swipeButton = (
-        <View style={styles.eventSwipeButton}>
-          <TouchableHighlight 
-            style={styles.button} 
-            onPress={this.alertDisconnect}
-            underlayColor='#ffffff'
-          >
-            <Text style={styles.text}>start swiping</Text>
-          </TouchableHighlight>
-        </View>
-      );
+      if (this.state.deviceOpened && !this.state.deviceConnected) {
+        swipeButton = (
+          <ActivityIndicatorIOS
+            style={styles.eventSwipeButton}
+            size='large'
+          />
+        );
+      } else if (!this.state.deviceOpened){
+        swipeButton = (
+          <View style={styles.eventSwipeButton}>
+            <TouchableHighlight 
+              style={styles.button} 
+              onPress={this.alertDisconnect}
+              underlayColor='#ffffff'
+            >
+              <Text style={styles.text}>start swiping</Text>
+            </TouchableHighlight>
+          </View>
+        );
+      }
     }
     return (
-      <View style={styles.eventContainer}>
+      <ScrollView 
+        scrollEnabled={false}
+        contentContainerStyle={styles.eventContainer}>
         <View style={styles.eventTopContainer}>
           <View style={styles.eventLabelContainer}>
             <View style={styles.eventRow}>
@@ -158,11 +205,11 @@ var Event = React.createClass({
             <View style={styles.eventRow}>
               <TextInput
                 style={styles.input}
-                autoFocus={true}
+                autoFocus={false}
                 onFocus={()=>this.setState({editingName: true, editingDate: false})}
                 clearButtonMode='while-editing'
                 onChangeText={(text) => this.setState({name: text})}
-                onSubmitEditing={this.submitName}
+                onEndEditing={this.submitName}
                 placeholder="Event Name"
                 value={this.state.name}
                 returnKeyType='done'
@@ -172,24 +219,28 @@ var Event = React.createClass({
             <View style={styles.eventRow}>
               <Text 
                 style={styles.inputText} 
-                onPress={()=>{if(!this.state.editingName){this.setState({editingDate: true});}}}
+                onPress={()=>{this.setState({editingDate: true});}}
               >
                 {this.state.date.toDateString()}
               </Text>
               {dateButton}
             </View>
           </View>
-          
         </View>
-        {datePicker}
-        {swipeButton}
-      </View>
+        <View style={styles.eventBottomContainer}>
+          <ListView
+            style={styles.swipedContainer}
+            automaticallyAdjustContentInsets={false}
+            dataSource={this.state.dataSource}
+            renderRow={this.renderName}
+          />
+          {datePicker}
+          {swipeButton}
+        </View>
+      </ScrollView>
     );
   },
 });
 
-//           <ListView
-//             dataSource={this.state.dataSource}
-//             renderRow={this.renderName}
-//           />
+
 module.exports = Event;
