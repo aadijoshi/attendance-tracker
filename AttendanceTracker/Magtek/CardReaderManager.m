@@ -24,8 +24,6 @@ RCT_EXPORT_METHOD(initMagTek)
   [self magTekToggleObservers:true];
   [self.magTek setDeviceType:MAGTEKIDYNAMO];
   [self.magTek setDeviceProtocolString:(@"com.magtek.idynamo")];
-  [self.magTek openDevice];
-  [self.magTek closeDevice];
   [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
                                                   body:@{
                                                          @"msg": @"Initialized iDynamo",
@@ -37,9 +35,8 @@ RCT_EXPORT_METHOD(updateConnStatus)
 {
   BOOL isDeviceConnected = [self.magTek isDeviceConnected];
   BOOL isDeviceOpened = [self.magTek isDeviceOpened];
-  [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
+  [self.bridge.eventDispatcher sendDeviceEventWithName:@"updateConnStatus"
                                                   body:@{
-                                                         @"caller":@"updateConnStatus",
                                                          @"isDeviceConnected": @(isDeviceConnected),
                                                          @"isDeviceOpened": @(isDeviceOpened),
                                                          }];
@@ -47,14 +44,11 @@ RCT_EXPORT_METHOD(updateConnStatus)
 
 RCT_EXPORT_METHOD(openDevice)
 {
-  if (![self.magTek isDeviceOpened] && [self.magTek isDeviceConnected])
+  if (![self.magTek isDeviceOpened] && ![self.magTek isDeviceConnected])
   {
     BOOL isOpened = [self.magTek openDevice];
-    [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
-                                                    body:@{
-                                                           @"caller":@"openDevice",
-                                                           @"isOpened":@(isOpened),
-                                                           }];
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"openDevice"
+                                                    body:@(isOpened)];
   }
 }
 
@@ -79,16 +73,15 @@ RCT_EXPORT_METHOD(closeDevice)
   NSNumber *status = [[notification userInfo] valueForKey:@"status"];
   switch ([status intValue]) {
     case TRANS_STATUS_OK:
-      [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
+      [self.bridge.eventDispatcher sendDeviceEventWithName:@"trackDataReady"
                                                       body:@{
-                                                             @"caller":@"trackDataReady",
                                                              @"status":@"TRANS_STATUS_OK",
+                                                             @"data":[self.magTek getTrack2Masked],
                                                              }];
       break;
     case TRANS_STATUS_ERROR:
-      [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
+      [self.bridge.eventDispatcher sendDeviceEventWithName:@"trackDataReady"
                                                       body:@{
-                                                             @"caller":@"trackDataReady",
                                                              @"status":@"TRANS_STATUS_ERROR",
                                                              }];
       break;

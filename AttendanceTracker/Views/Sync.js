@@ -1,8 +1,7 @@
 var React = require('react-native');
-var styles = require('../index.ios.js');
+var styles = require('./styles.js');
 
 var {
-  StyleSheet,
   Text,
   View,
   TouchableHighlight,
