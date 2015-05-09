@@ -245,9 +245,11 @@ $(function(){
         // TO-DO: here is the check and DOM update for no events/no students
         if (events.length == 0) {
             $("#" + eventsTableId).append("<h2>No events to display, please try new search</h2>");
+            $(".hide-no-events").hide();
             doneLoading();
             return;
         }
+        $(".hide-no-events").show();
         console.log("Students:")
         console.log(students);
         console.log("Events:")
@@ -263,8 +265,28 @@ $(function(){
 
         createEventsTable();
 
+        createGlobalGraphs();
+
         doneLoading();
 
+    }
+
+    var createGlobalGraphs = function() {
+        var c1 = $("#genderGraphRow div").highcharts();
+        if (c1) {
+            c1.destroy();
+        }
+        var c2 = $("#yearGraphRow div").highcharts();
+        if (c2) {
+            c2.destroy();
+        }
+        $("#participantsGlobal").html("");
+
+        getGenderChartAt("#genderGraph div", events);
+
+        getYearChartAt("#yearGraph div", events);
+
+        getGeneralInfoAt("#participantsGlobal", events);
     }
 
     var createEventsTable = function () {
@@ -326,15 +348,17 @@ $(function(){
         var eventParticipants = getEventParticipants(ev);
         var isMultipleEvent = _.isArray(ev);
 
-        $("#generalInfoH h4 span").html(" ("+ eventParticipants.length + " " + (eventParticipants.length == 1 ? "person" : "people") + ")")
+        var tableId = "studentsTableContainer" + id.substring(1);
+
+        $(id + "H h4 span").html(" ("+ eventParticipants.length + " " + (eventParticipants.length == 1 ? "person" : "people") + ")")
 
         var tableElement = $("<table />", {
-            id: "studentsTableContainer"
+            id: tableId
         }).appendTo(id);
         tableElement.addClass("table table-hover sortable");
         tableElement.append("\
             <thead> \
-                <th>Name</th> \
+                <th data-defaultsort='asc'>Name</th> \
                 <th>Gender</th> \
                 <th>Year</th> \
             </thead> \
@@ -343,10 +367,10 @@ $(function(){
         ");
 
         if (isMultipleEvent) {
-            $("#studentsTableContainer thead").append("<th>Attended</th>");
+            $("#" + tableId + " thead tr").append("<th>Attended</th>");
         }
 
-        tableElement = $("#studentsTableContainer tbody");
+        tableElement = $("#" + tableId + " tbody");
 
         var tableRowElement = _.template("\
             <tr id='<%= id %>' class='clickable-row'> \
@@ -369,7 +393,7 @@ $(function(){
                 year : student.year,
             }));
             if (isMultipleEvent) {
-                $("#" + getParticipantId(participant)).append(participated({
+                $("#" + getParticipantId(participant)).append(participatedElement({
 
                     participated : _.chain(events)
                         .filter(function(ev) {
@@ -481,10 +505,10 @@ $(function(){
         // filter ones that we don't need
         if (constraint) {
             eventParticipants = _.filter(eventParticipants, function (participant) {
-                if (studentsDict[participant].gender == null && constraint == "null") {
+                if (studentsDict[participant].year == null && constraint == "null") {
                     return true;
                 }
-                return studentsDict[participant].gender == constraint;
+                return studentsDict[participant].year == constraint;
             })
         }
 

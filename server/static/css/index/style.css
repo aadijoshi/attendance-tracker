@@ -38,30 +38,11 @@
 }
 
 /*
-#statsModal .modal-content {
-  height: inherit;
-}
-
-#statsModal .modal-body {
-  height: inherit;
-}
-
-#infoRow > div {
-  height: 100%;
-}
-
-#genderGraphRow {
-  height: 50% !important;
-}
-
-#yearGraphRow{
-  height: 50% !important;
-}
-
-#infoRow {
-  height: 100% !important;
-}
+  Larger input
 */
+#filterInput {
+  width: 500px;
+}
 
 /*
   Clickable rows
