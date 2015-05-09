@@ -19,7 +19,7 @@ $(function(){
     // Date format (if changes, need to be changed in several places)
     var dateFormat = "YYYY-MM-DD";
     // Table id to find main events table
-    var eventsTableId = "eventsTableContainter";
+    var eventsTableId = "eventsTable";
 
     // Helper functions to get ID strings
     var getEventId = function (id) {
@@ -41,7 +41,6 @@ $(function(){
 
     // Dirty fix for proper graphs styling
     $("#statsModal").on("shown.bs.modal", function (e) {
-        console.log('resize');
         $(window).resize();
 
         $("#graphLoading").hide();
@@ -250,18 +249,13 @@ $(function(){
             return;
         }
         $(".hide-no-events").show();
-        console.log("Students:")
-        console.log(students);
-        console.log("Events:")
-        console.log(events);
+
 
         // converts students to students dictionary for easy look up by n_number
         studentsDict = _.object(_.map(students, function(item) {
            return [item.pk, item.fields]
         }));
 
-        console.log("Students dictionary:")
-        console.log(studentsDict);
 
         createEventsTable();
 
@@ -293,7 +287,7 @@ $(function(){
         var tableElement = $("<table />", {
             id: eventsTableId
         }).appendTo("#eventsTableContainter");
-        tableElement.addClass("table table-hover sortable");
+        tableElement.addClass("table table-hover sortable hide-no-events");
         tableElement.append("\
             <thead> \
                 <th>Name</th> \
@@ -349,6 +343,13 @@ $(function(){
     }
 
     var applyFilter = function (filteredEvents) {
+        if (filteredEvents.length == 0) {
+            $("#" + eventsTableId).after("<h2>No events to display, please try new search</h2>");
+            $(".hide-no-events").hide();
+        } else {
+            $("#eventsTableContainter h2").remove();
+            $(".hide-no-events").show();
+        }
         getGeneralInfoAt("#participantsGlobal", filteredEvents);
         $("#eventsTableContainter tbody tr").hide()
         _.each(filteredEvents, function (ev) {
