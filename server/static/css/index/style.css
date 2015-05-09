@@ -2,7 +2,7 @@
   Modal-related styles
 */
 .modal {
-  text-align: center !important;
+  text-align: center;
 }
 
 .modal:before {
@@ -28,6 +28,13 @@
 #statsModal .modal-dialog {
   width: 95%;
   margin: 10 auto;
+}
+
+/*
+  Resetting modal's text align
+*/
+#generalInfo {
+  text-align: left;
 }
 
 /*

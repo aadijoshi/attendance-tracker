@@ -25,6 +25,9 @@ $(function(){
     var getEventId = function (id) {
         return "event" + id;
     }
+    var getParticipantId = function (id) {
+        return "participant" + id;
+    }
 
     // Logic starts here
 
@@ -57,6 +60,12 @@ $(function(){
         if (c2) {
             c2.destroy();
         }
+
+        $("#genderGraphRow div").hide();
+        $("#yearGraphRow div").hide();
+        $("#generalInfoH").hide();
+        $("#graphLoading").show();
+        $("#generalInfo").html("");
     });
 
     // Load semesters data from the server
@@ -300,25 +309,82 @@ $(function(){
     var tableRowModal = function(ev) {
         $("#statsModal .modal-title").text(ev.fields.name + " (" + ev.fields.date + ")");
 
-        $("#genderGraphRow div").hide();
-        $("#yearGraphRow div").hide();
-        $("#generalInfoH").hide();
-        $("#graphLoading").show();
-
         $("#statsModal").modal("show");
 
         setTimeout(function(){
             getGenderChartAt("#genderGraphRow div", ev);
 
             getYearChartAt("#yearGraphRow div", ev);
+
+            getGeneralInfoAt("#generalInfo", ev);
+
         }, loadingInterval);
 
-        // getGenderChartAt("#genderGraphRow div", ev);
+    }
 
-        // getYearChartAt("#yearGraphRow div", ev);
+    var getGeneralInfoAt = function (id, ev) {
+        var eventParticipants = getEventParticipants(ev);
+        var isMultipleEvent = _.isArray(ev);
 
-        // $("#statsModal").modal("show");
+        $("#generalInfoH h4 span").html(" ("+ eventParticipants.length + " " + (eventParticipants.length == 1 ? "person" : "people") + ")")
 
+        var tableElement = $("<table />", {
+            id: "studentsTableContainer"
+        }).appendTo(id);
+        tableElement.addClass("table table-hover sortable");
+        tableElement.append("\
+            <thead> \
+                <th>Name</th> \
+                <th>Gender</th> \
+                <th>Year</th> \
+            </thead> \
+            <tbody> \
+            </tbody> \
+        ");
+
+        if (isMultipleEvent) {
+            $("#studentsTableContainer thead").append("<th>Attended</th>");
+        }
+
+        tableElement = $("#studentsTableContainer tbody");
+
+        var tableRowElement = _.template("\
+            <tr id='<%= id %>' class='clickable-row'> \
+                <td><%= name %></td> \
+                <td><%= gender %></td> \
+                <td><%= year %></td> \
+            </tr> \
+        ");
+
+        var participatedElement = _.template("\
+            <td><%= participated %></td> \
+        ");
+
+        _.each(eventParticipants, function (participant) {
+            var student = studentsDict[participant];
+            tableElement.append(tableRowElement({
+                id : getParticipantId(participant),
+                name : student.last_name + " " + student.first_name,
+                gender : student.gender,
+                year : student.year,
+            }));
+            if (isMultipleEvent) {
+                $("#" + getParticipantId(participant)).append(participated({
+
+                    participated : _.chain(events)
+                        .filter(function(ev) {
+                            return _.indexOf(ev.fields.participants, participant) != -1
+                        })
+                        .value()
+                        .length
+
+                }));
+            }
+
+            // $("#" + getEventId(ev.pk)).on("click", tableRowModal.bind(this, ev));
+        });
+
+        $.bootstrapSortable("applyLast");
     }
 
     var getGenderChartAt = function (id, ev) {
@@ -331,6 +397,8 @@ $(function(){
             }
         });
 
+        console.log(series);
+
         var drilldown = _.map(series, function (num) {
             return {
                 id : num.drilldown,
@@ -338,7 +406,9 @@ $(function(){
             }
         });
 
-        var s = $(id).highcharts({
+        console.log(drilldown);
+
+        $(id).highcharts({
             chart: {
                 type: 'pie'
             },
@@ -361,8 +431,6 @@ $(function(){
                 pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} ({point.percentage:.2f}%)</b><br/>'
             },
         });
-
-        console.log(s);
     };
 
     var getYearChartAt = function (id, ev) {
@@ -413,7 +481,10 @@ $(function(){
         // filter ones that we don't need
         if (constraint) {
             eventParticipants = _.filter(eventParticipants, function (participant) {
-                return studentsDict[participant].year == constraint;
+                if (studentsDict[participant].gender == null && constraint == "null") {
+                    return true;
+                }
+                return studentsDict[participant].gender == constraint;
             })
         }
 
@@ -432,6 +503,9 @@ $(function(){
         // filter ones that we don't need
         if (constraint) {
             eventParticipants = _.filter(eventParticipants, function (participant) {
+                if (studentsDict[participant].gender == null && constraint == "null") {
+                    return true;
+                }
                 return studentsDict[participant].gender == constraint;
             })
         }
