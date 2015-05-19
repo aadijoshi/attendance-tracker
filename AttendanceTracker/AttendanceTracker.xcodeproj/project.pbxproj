@@ -38,6 +38,7 @@
 		916F415D1AF90F5900B4B06C /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F415C1AF90F5900B4B06C /* ExternalAccessory.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		916F41621AF9101000B4B06C /* libMTSCRA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 916F41611AF9101000B4B06C /* libMTSCRA.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		916F41651AF9101D00B4B06C /* CardReaderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 916F41641AF9101D00B4B06C /* CardReaderManager.m */; };
+		91A0DC6D1AFE8C6A00029C95 /* libRNModal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91A0DC6C1AFE8C4A00029C95 /* libRNModal.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +119,13 @@
 			remoteGlobalIDString = 58B5119B1A9E6C1200147676;
 			remoteInfo = RCTText;
 		};
+		91A0DC6B1AFE8C4A00029C95 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 91A0DC671AFE8C4A00029C95 /* RNModal.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNModal;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -159,6 +167,7 @@
 		916F41611AF9101000B4B06C /* libMTSCRA.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMTSCRA.a; path = Magtek/release/libMTSCRA.a; sourceTree = "<group>"; };
 		916F41631AF9101D00B4B06C /* CardReaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CardReaderManager.h; path = Magtek/CardReaderManager.h; sourceTree = "<group>"; };
 		916F41641AF9101D00B4B06C /* CardReaderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CardReaderManager.m; path = Magtek/CardReaderManager.m; sourceTree = "<group>"; };
+		91A0DC671AFE8C4A00029C95 /* RNModal.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNModal.xcodeproj; path = "node_modules/react-native-modal/RNModal.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +192,8 @@
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
+				91A0DC6D1AFE8C6A00029C95 /* libRNModal.a in Frameworks */,
+				916F41621AF9101000B4B06C /* libMTSCRA.a in Frameworks */,
 				916F413B1AF90F0000B4B06C /* CoreTelephony.framework in Frameworks */,
 				916F41471AF90F0C00B4B06C /* MessageUI.framework in Frameworks */,
 				916F41491AF90F1600B4B06C /* libz.dylib in Frameworks */,
@@ -192,7 +203,6 @@
 				916F414D1AF90F2800B4B06C /* libstdc++.dylib in Frameworks */,
 				916F41531AF90F3B00B4B06C /* MediaPlayer.framework in Frameworks */,
 				916F41551AF90F4000B4B06C /* AudioToolbox.framework in Frameworks */,
-				916F41621AF9101000B4B06C /* libMTSCRA.a in Frameworks */,
 				916F41591AF90F4C00B4B06C /* Foundation.framework in Frameworks */,
 				916F41571AF90F4600B4B06C /* UIKit.framework in Frameworks */,
 				916F415B1AF90F5300B4B06C /* CoreGraphics.framework in Frameworks */,
@@ -311,6 +321,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				91A0DC671AFE8C4A00029C95 /* RNModal.xcodeproj */,
 				916F41611AF9101000B4B06C /* libMTSCRA.a */,
 				916F41601AF9100100B4B06C /* MTSCRA.h */,
 				916F415F1AF90F7B00B4B06C /* MagTek */,
@@ -383,6 +394,14 @@
 				916F413A1AF90F0000B4B06C /* CoreTelephony.framework */,
 			);
 			name = MagTek;
+			sourceTree = "<group>";
+		};
+		91A0DC681AFE8C4A00029C95 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				91A0DC6C1AFE8C4A00029C95 /* libRNModal.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -493,6 +512,10 @@
 					ProductGroup = 146834001AC3E56700842450 /* Products */;
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
+				{
+					ProductGroup = 91A0DC681AFE8C4A00029C95 /* Products */;
+					ProjectRef = 91A0DC671AFE8C4A00029C95 /* RNModal.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -571,6 +594,13 @@
 			fileType = archive.ar;
 			path = libRCTText.a;
 			remoteRef = 832341B41AAA6A8300B99B32 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		91A0DC6C1AFE8C4A00029C95 /* libRNModal.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNModal.a;
+			remoteRef = 91A0DC6B1AFE8C4A00029C95 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

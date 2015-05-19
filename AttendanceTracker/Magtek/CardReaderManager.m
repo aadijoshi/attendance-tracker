@@ -55,9 +55,9 @@ RCT_EXPORT_METHOD(openDevice)
 
 RCT_EXPORT_METHOD(closeDevice)
 {
+  [self magTekToggleObservers:false];
   if ([self.magTek isDeviceOpened])
   {
-    [self magTekToggleObservers:false];
     [self.magTek clearBuffers];
     BOOL isClosed = [self.magTek closeDevice];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"Log"
